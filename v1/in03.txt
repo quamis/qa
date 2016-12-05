@@ -1,0 +1,32 @@
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?
+ - comentarii, dar astea se pot rezolva in timp
+ - in obiect, la nivel de serviciu eu ii specific o operatie care tine de obiect.
+	Obiectul Service ar trebui sa reprezinte un serviciu, nu si operatiile care se efectueaza pe el(insert/delete/merge tine de ceea ce face TINA intern)
+ - Service e in realitate "Request"?

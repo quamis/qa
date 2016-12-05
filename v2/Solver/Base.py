@@ -53,4 +53,4 @@ class Base(object):
             sum+=tbuf[i]
         
         s+= "    (%d)" % (sum)
-        print(s)
+        return s

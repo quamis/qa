@@ -60,6 +60,11 @@ if __name__ == '__main__':
         !!! not found !!!
     
     
+    >> "fedcba"
+    time py ./solve.py --length=6 --sum=597 --md5=8df67bd6d5e123d52a9a966bb31cf719
+    
+    
+    
     ~~~~~~~~~~~~~~~~~
     simple sum tests:
     time py ./solve.py --length=3 --sum=1
@@ -80,5 +85,10 @@ if __name__ == '__main__':
     slv.setHint('sum', args['sum'])
     slv.setHint('md5', args['md5'])
     
-    for t in slv.solve():
-        print(t)
+    def _evt_solved(buf):
+        print(buf)
+        
+    slv.solve(callback=_evt_solved)
+    
+    #for t in slv.solve():
+    #    print(t)

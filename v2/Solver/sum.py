@@ -140,11 +140,14 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
         else:
             self._generate_tbuf_fromsum(tbuf, self.hints['sum'], 0, 0xff)
         
+        self.callback = None
+        
     def _found_solution(self, tbuf):
         self.callback(tbuf)
         
     def _generate_tbuf_fromsum(self, tbuf, sum, offset, cc):
         if (self.hints['length']-offset)*0xff<sum:
+            #print("f.ret: %s" % (self.print_tbuf(tbuf)))
             return 1+((sum - ((self.hints['length']-offset-1)*0xff))//0xff)
         
         tbuf[offset] = 0x00
@@ -153,6 +156,7 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
             tbuf[offset] = c
             nsum = sum-c
             if nsum==0:
+                #print("match: %s" % (self.print_tbuf(tbuf)))
                 self._found_solution(tbuf)
             else:
                 if noffset<self.hints['length']:
@@ -165,6 +169,7 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
                     tbuf[offset] = 0x00
                     return 0
         
+        #print("retur: %s" % (self.print_tbuf(tbuf)))
         tbuf[offset] = 0x00
         return 0
         

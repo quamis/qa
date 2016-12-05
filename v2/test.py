@@ -239,7 +239,7 @@ class Solver_sum_VX(unittest.TestCase):
     def test_4_z_0xffm2(self):
         self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff*4), 1)
         
-
+        
 class Solver_sum_VX_withCallback(Solver_sum_VX):
     def getSolver(self):
         pass
@@ -260,6 +260,18 @@ class Solver_sum_V1_1(Solver_sum_VX):
 class Solver_sum_V1_3(Solver_sum_VX_withCallback):
     def getSolver(self):
         return Solver.sum.V1_3()
+    
+    def test_6_z_0x01(self):
+        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x01), 1)
+        
+    def test_6_z_0x02(self):
+        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x02), 2)
+        
+    def test_6_z_0x06(self):
+        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x06), 11)
+        
+    def test_6_s_623(self):
+        self.assertEqual(self.getCounter()(self.getSolver(), 6, 623), 11)
         
 class Solver_sum_V3(Solver_sum_VX):
     def getSolver(self):
