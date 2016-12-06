@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+
 import Solver.Base
 
 """
@@ -135,6 +137,7 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
         tbuf = bytearray([0x00]*self.hints['length'])
         self.callback = callback
         
+        sys.stdout.write("\n\n")
         if self.hints['sum']==0:
             self._found_solution(tbuf)
         else:
@@ -142,8 +145,8 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
         
         self.callback = None
         
-    def _found_solution(self, tbuf):
-        self.callback(tbuf)
+    def _found_solution(self, tbuf, depth):
+        return self.callback(tbuf, depth)
         
     def _generate_tbuf_fromsum(self, tbuf, sum, offset, cc):
         if (self.hints['length']-offset)*0xff<sum:
@@ -157,7 +160,10 @@ class V1_3(Solver.Base.Base):  # TODO: convert this to a callback-hell-based sol
             nsum = sum-c
             if nsum==0:
                 #print("match: %s" % (self.print_tbuf(tbuf)))
-                self._found_solution(tbuf)
+                r = self._found_solution(tbuf, offset)
+                if r:
+                    if r['return']:
+                        return r['return']
             else:
                 if noffset<self.hints['length']:
                     # check childs

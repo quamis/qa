@@ -4,6 +4,18 @@ import unittest
 
 import Solver.sum
 import Solver.sumAndMD5
+import Solver.sumAndMedian
+
+"""
+    >>>py ./test.py -v 2>&1 >test_04_x.log
+    
+    py ./test.py -v Solver_sum_V3_1_vs_V1.test_02_x >test_vs.log
+    py ./test.py -v Solver_sum_V3_1_vs_V1.test_03_x >test_vs.log
+    py ./test.py -v Solver_sum_V3_1_vs_V1.test_04_x >test_vs.log
+    
+    
+    py ./test.py -v Solver_sum_V1_3.test_6_s_623
+"""
 
 DBG=False
 
@@ -49,17 +61,27 @@ def countCallbackSolver(slv, len, sum):
         print("    solutions: %d" % (solutions))
     return solutions
     
-
-"""
-    >>>py ./test.py -v 2>&1 >test_04_x.log
     
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_02_x >test_vs.log
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_03_x >test_vs.log
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_04_x >test_vs.log
+def countCallbackSolver2(slv):
+    def slv_callback(s):
+        if DBG:
+            print("    %s" % slv.print_tbuf(s))
+        global solutions
+        solutions+=1
+   
+    if DBG:
+        print("")
+        print("-"*80)
+        print("%s, %d, %d " % (type(slv), slv.hints['length'], slv.hints['sum']))
     
+    global solutions
+    solutions = 0
+    slv.solve(callback=slv_callback)
     
-    py ./test.py -v Solver_sum_V3_1.test_3_6
-"""
+    if DBG:
+        print("    solutions: %d" % (solutions))
+    return solutions
+    
 
 class Solver_sum_VX(unittest.TestCase):
     def getSolver(self):
@@ -282,6 +304,19 @@ class Solver_sum_V3_1(Solver_sum_VX):
         return Solver.sum.V3_1()
 
         
+class Solver_sumAndMedian_V1(unittest.TestCase):
+    def getSolver(self, len, sum, median):
+        slv = Solver.sumAndMedian.V1()
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('median', median)
+        return slv
+        
+    def getCounter(self):
+        return countCallbackSolver2
+        
+    def test_6_s_623(self):
+        self.assertEqual(self.getCounter()(self.getSolver(6, 623, 0x62)), 11)
 
 
 if __name__ == '__main__':
