@@ -2,6 +2,8 @@ import sys, time
 import argparse
 import unittest
 
+import Tests.Base
+
 import Solver.sum
 import Solver.sumAndMD5
 import Solver.sumAndMedian
@@ -17,293 +19,82 @@ import Solver.sumAndMedian
     py ./test.py -v Solver_sum_V1_3.test_6_s_623
 """
 
-DBG=False
-
-def countSolver(slv, len, sum):
-    slv.setHint('length', len)
-    slv.setHint('sum', sum)
-   
-    if DBG:
-        print("")
-        print("-"*80)
-        print("%s, %d, %d " % (type(slv), len, sum))
-    
-    solutions = 0
-    for s in slv.solve():
-        if DBG:
-            print("    %s" % slv.print_tbuf(s))
-        solutions+=1
-    
-    if DBG:
-        print("    solutions: %d" % (solutions))
-    return solutions
-    
-def countCallbackSolver(slv, len, sum):
-    slv.setHint('length', len)
-    slv.setHint('sum', sum)
-    
-    def slv_callback(s):
-        if DBG:
-            print("    %s" % slv.print_tbuf(s))
-        global solutions
-        solutions+=1
-   
-    if DBG:
-        print("")
-        print("-"*80)
-        print("%s, %d, %d " % (type(slv), len, sum))
-    
-    global solutions
-    solutions = 0
-    slv.solve(callback=slv_callback)
-    
-    if DBG:
-        print("    solutions: %d" % (solutions))
-    return solutions
-    
-    
-def countCallbackSolver2(slv):
-    def slv_callback(s):
-        if DBG:
-            print("    %s" % slv.print_tbuf(s))
-        global solutions
-        solutions+=1
-   
-    if DBG:
-        print("")
-        print("-"*80)
-        print("%s, %d, %d " % (type(slv), slv.hints['length'], slv.hints['sum']))
-    
-    global solutions
-    solutions = 0
-    slv.solve(callback=slv_callback)
-    
-    if DBG:
-        print("    solutions: %d" % (solutions))
-    return solutions
-    
-
-class Solver_sum_VX(unittest.TestCase):
-    def getSolver(self):
-        pass
-        
+class Solver_sum_Recursive(Tests.Base.Solver_sum_Binary):
+    def getSolver(self, len, sum):
+        slv = Solver.sum.Recursive()
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        return slv
         
     def getCounter(self):
-        return countSolver
-        
-    def test_2_1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 1), 1)
-        
-    def test_2_2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 2), 2)
-        
-    def test_2_3(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 3), 2)
-        
-    def test_2_4(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 4), 3)
-        
-    def test_2_5(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 5), 3)
-        
-    def test_2_6(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 6), 4)
-        
-    def test_2_7(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 7), 4)
-        
-    def test_2_8(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 8), 5)
-        
-    def test_2_9(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 9), 5)
-        
-        
-    def test_2_z_0x01(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0x01), 1)
-        
-    def test_2_z_0x02(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0x02), 2)
-        
-    def test_2_z_0x04(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0x04), 3)
-        
-    def test_2_z_0x0f(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0x0f), 8)
-        
-    def test_2_z_0x1f(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0x1f), 16)
-        
-    def test_2_z_0xffd2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff//2), 64)
-        
-    def test_2_z_0xffd2a1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff//2+1), 65)
-        
-    def test_2_z_0xffd2a2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff//2+2), 65)
-        
-    def test_2_z_0xffm2d2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff*2//2), 128)
-        
-    def test_2_z_0xffm2s2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff*2-2), 2)
-        
-    def test_2_z_0xffm2s1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff*2-1), 1)
-        
-    def test_2_z_0xffm2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 2, 0xff*2), 1)
-        
+        return Tests.Base.countSolver
+  
 
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def test_3_1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 1), 1)
-        
-    def test_3_2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 2), 2)
-        
-    def test_3_3(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 3), 3)
-        
-    def test_3_4(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 4), 4)
-        
-    def test_3_5(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 5), 5)
-        
-    def test_3_6(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 6), 7)
-        
-    def test_3_7(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 7), 8)
-        
-    def test_3_8(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 8), 10)
-        
-    def test_3_9(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 9), 12)
-        
-        
-    def test_3_0x08f(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 0x8f), 1776)
-        
-    def test_3_0x0f8(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 0xf8), 5250)
-        
-    def test_3_0x0ff(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 3, 0xff), 5547)
-        
-
-   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def test_4_1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 1), 1)
-        
-    def test_4_2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 2), 2)
-        
-    def test_4_3(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 3), 3)
-        
-    def test_4_4(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 4), 5)
-        
-    def test_4_5(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 5), 6)
-        
-    def test_4_6(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 6), 9)
-        
-    def test_4_7(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 7), 11)
-        
-    def test_4_8(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 8), 15)
-        
-    def test_4_9(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 9), 18)
-        
-        
-        
-    def test_4_z_0x01(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0x01), 1)
-        
-    def test_4_z_0x02(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0x02), 2)
-        
-    def test_4_z_0x04(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0x04), 5)
-        
-    def test_4_z_0x0f(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0x0f), 54)
-        
-    def test_4_z_0x1f(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0x1f), 321)
-        
-    def test_4_z_0xffd2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff//2), 15961)
-        
-    def test_4_z_0xffd2a1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff//2+1), 16335)
-        
-    def test_4_z_0xffd2a2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff//2+2), 16698)
-        
-    def test_4_z_0xffm2d2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff*4//2), 474290)
-        
-    def test_4_z_0xffm2s2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff*4-2), 2)
-        
-    def test_4_z_0xffm2s1(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff*4-1), 1)
-        
-    def test_4_z_0xffm2(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 4, 0xff*4), 1)
-        
-        
-class Solver_sum_VX_withCallback(Solver_sum_VX):
-    def getSolver(self):
-        pass
+class Solver_sum_RecursiveOptimized(Tests.Base.Solver_sum_Binary_withCallback):
+    def getSolver(self, len, sum):
+        slv = Solver.sum.RecursiveOptimized()
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        return slv
         
     def getCounter(self):
-        return countCallbackSolver
-    
-    
-    
-class Solver_sum_V1(Solver_sum_VX):
-    def getSolver(self):
-        return Solver.sum.V1()
-        
-class Solver_sum_V1_1(Solver_sum_VX):
-    def getSolver(self):
-        return Solver.sum.V1_1()
-
-class Solver_sum_V1_3(Solver_sum_VX_withCallback):
-    def getSolver(self):
-        return Solver.sum.V1_3()
+        return Tests.Base.countSolverWithCallback
     
     def test_6_z_0x01(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x01), 1)
+        self.assertEqual(self.getCounter()(self.getSolver(6, 0x01)), 1)
         
     def test_6_z_0x02(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x02), 2)
+        self.assertEqual(self.getCounter()(self.getSolver(6, 0x02)), 2)
         
     def test_6_z_0x06(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 6, 0x06), 11)
+        self.assertEqual(self.getCounter()(self.getSolver(6, 0x06)), 11)
+     
+    # way too slow
+    #def test_6_s_623(self):
+    #    self.assertEqual(self.getCounter()(self.getSolver(6, 623)), 11)
         
-    def test_6_s_623(self):
-        self.assertEqual(self.getCounter()(self.getSolver(), 6, 623), 11)
         
-class Solver_sum_V3(Solver_sum_VX):
-    def getSolver(self):
-        return Solver.sum.V3()
         
-class Solver_sum_V3_1(Solver_sum_VX):
-    def getSolver(self):
-        return Solver.sum.V3_1()
-
         
+class Solver_sum_RecursiveOptimized_withInterval(Tests.Base.Solver_sum_Words_withCallback):
+    def getSolver(self, len, sum, interval):
+        slv = Solver.sum.RecursiveOptimized()
+        
+        # min width: 4+4+2 = 10
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('interval', (max(interval), min(interval)))
+        return slv
+        
+    def getHitCounter(self):
+        return Tests.Base.countSolverHitsWithCallback
+    
+    
+    def test_02_10_ba(self):
+        self.assertEqual(self.getHitCounter()('ba'.encode('utf-8'), self.getSolver(2, 195, (0x62, 0x61))), 1)
+        
+    def test_02_11_za(self):
+        self.assertEqual(self.getHitCounter()('za'.encode('utf-8'), self.getSolver(2, 219, (0x7a, 0x61))), 1)
+        
+    def test_04_10_cbaa(self):
+        self.assertEqual(self.getHitCounter()('cbaa'.encode('utf-8'), self.getSolver(4, 391, (0x63, 0x61))), 1)
+        
+    def test_04_11_zeba(self):
+        self.assertEqual(self.getHitCounter()('zeba'.encode('utf-8'), self.getSolver(4, 418, (0x7a, 0x61))), 1)
+    
+    def test_06_10_uscbaa(self):
+        self.assertEqual(self.getHitCounter()('uscbaa'.encode('utf-8'), self.getSolver(6, 623, (0x75, 0x61))), 1)
+        
+    def test_06_10_zscbaa(self):
+        self.assertEqual(self.getHitCounter()('zscbaa'.encode('utf-8'), self.getSolver(6, 628, (0x7a, 0x61))), 1)
+        
+    def test_06_10_rrnmeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61))), 1)
+        
+    def test_16_10_srrrpnmieeeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61))), 1)
+        
+"""
 class Solver_sumAndMedian_V1(unittest.TestCase):
     def getSolver(self, len, sum, median):
         slv = Solver.sumAndMedian.V1()
@@ -313,14 +104,13 @@ class Solver_sumAndMedian_V1(unittest.TestCase):
         return slv
         
     def getCounter(self):
-        return countCallbackSolver2
+        return countSolverWithCallback
         
     def test_6_s_623(self):
         self.assertEqual(self.getCounter()(self.getSolver(6, 623, 0x62)), 11)
 
+"""
 
 if __name__ == '__main__':
     unittest.main()
-    
-    
     

@@ -12,7 +12,9 @@ if __name__ == '__main__':
     bytes = args['str'].encode('utf-8')
     sbytes = sorted(bytearray(bytes), reverse=True)
     
+    print("    as sorted str:    %s" % ( ' '.join( colored("%s" % (chr(c)), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
     print("    as sorted hex: 0x%s" % ( ''.join( colored("%02x" % (c), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
+    
     
     print("    --length=%d" % (len(bytes)))
     
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     print("        %d chars, len:2*char" % (max(bytes) - min(bytes)))
     
     dct = list(set(bytes))
-    dct.sort()
+    dct.sort(reverse=True)
     sd = ''.join("%s" % (chr(x)) for x in dct)
     print("    --dictionary='%s'" % (sd))
     print("        %d chars" % len(sd))
