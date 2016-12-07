@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys, time, hashlib, zlib, statistics
-
-import itertools
 import Solver.Base
 import Solver.sum
 from Solver.Base import CallbackResult
