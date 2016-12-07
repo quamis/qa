@@ -1,4 +1,4 @@
-import sys, time, hashlib, zlib, statistics
+import sys, time, hashlib, zlib
 import argparse
 from termcolor import colored
 
@@ -21,8 +21,8 @@ if __name__ == '__main__':
     print("    --sum=%d" % (sum(bytes)))
     print("        speed:10, ordering:False, len:4b")
     
-    print("    --median=0x%02x (0x%02x -> 0x%02x)" % (int(statistics.median(sbytes)), sbytes[0], sbytes[len(sbytes)-1]))
-    print("        depands on sum, optimization hint, ordering:False, len:1b")
+    print("    --median=0x%02x (0x%02x->0x%02x)" % (sbytes[len(sbytes)//2], sbytes[0], sbytes[len(sbytes)-1]))
+    print("        depends on sum, optimization hint, ordering:False, len:1b")
     
     lxor = 0x00
     for ch in bytes:

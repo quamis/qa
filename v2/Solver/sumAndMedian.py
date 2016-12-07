@@ -4,6 +4,7 @@ import sys, time, hashlib, zlib, statistics
 import itertools
 import Solver.Base
 import Solver.sum
+from Solver.Base import CallbackResult
 
 """
     seems accurate, fast, 0 false-positives
@@ -13,43 +14,43 @@ class V1(Solver.Base.Base):
     def __init__(self):
         super(V1, self).__init__()
         self.callback = None
+        self.hints['median'] = None
+        self.middleIndex = None
+        
+        self.stats['md'] = {}
+        self.stats['md']['='] = 0
+        self.stats['md']['>'] = 0
+        self.stats['md']['<'] = 0
+        
     
     def solve(self, callback=None):
-        slv = Solver.sum.V1_3()
+        slv = Solver.sum.RecursiveOptimized()
         slv.setHint('length', self.hints['length'])
         slv.setHint('sum', self.hints['sum'])
+        slv.setHint('interval', self.hints['interval'])
+        
+        self.middleIndex = self.hints['length']//2
         
         self.callback = callback
         slv.solve(callback=self._evt_sum_solved)
         self.callback = None
         
 
-    def _evt_sum_solved(self, buf, depth):
-        md = int(statistics.median(buf))
+    def _evt_sum_solved(self, buf, params):
+        md = buf[self.middleIndex]
+        if md==self.hints['median']:
+            self.stats['md']['=']+=1
+            return self.callback(buf, params)
         
-        """
-        if self.hints['median']==md:
-            sys.stdout.write("\n%s median:0x%02x ==\n" % (self.print_tbuf(buf), md))
-        
-        if self.hints['median']-5>md:
-            sys.stdout.write("\r%s median:0x%02x >...%d" % (self.print_tbuf(buf), md, int(max(0, depth - 6/2))))
-            return {'return': max(0, depth - 6/2)}
-        elif self.hints['median']+1<md:
-            sys.stdout.write("\r%s median:0x%02x <" % (self.print_tbuf(buf), md))
-            return {'return': max(0, depth-1)}
+        if params['depth']>self.middleIndex:
+            if md<self.hints['median']:
+                self.stats['md']['<']+=1
+                #return CallbackResult(params['depth'] - self.middleIndex) # this should be the most exact return
+                return CallbackResult(params['depth'] - self.middleIndex+1, self.hints['median'] - md-1) # "optimized"
+                #return CallbackResult(params['depth'] - self.middleIndex+1) # "optimized"
             
-        sys.stdout.write("\r%s median:0x%02x =" % (self.print_tbuf(buf), md))
-        """
-        
-        if self.hints['median']==md:
-            sys.stdout.write("\r\n%s median:0x%02x ==\n\r" % (self.print_tbuf(buf), md))
-        else:
-            if md>self.hints['median']:
-                sys.stdout.write("\r%s median:0x%02x > (d:%d)" % (self.print_tbuf(buf), md, depth))
-                return {'return': min(self.hints['length']/2, depth-1)-3}
-            elif md<self.hints['median']:
-                sys.stdout.write("\r%s median:0x%02x < (d:%d)" % (self.print_tbuf(buf), md, depth))
-                return {'return': min(self.hints['length']/2, depth-1)-3}
-            else:
-                sys.stdout.write("\r%s median:0x%02x = (d:%d)" % (self.print_tbuf(buf), md, depth))
-            
+            elif md>self.hints['median']:
+                self.stats['md']['>']+=1
+                #return CallbackResult(params['depth'] - self.middleIndex)
+                #return CallbackResult(params['depth'] - self.middleIndex, self.hints['median'] - md+1) # "optimized"
+                return CallbackResult(params['depth'] - self.middleIndex, md - self.hints['median']-1) # "optimized"

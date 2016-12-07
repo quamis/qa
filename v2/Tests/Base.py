@@ -69,10 +69,13 @@ def countSolverHitsWithCallback(match, slv):
     
     global solutions
     solutions = 0
+    slv.initialize()
     slv.solve(callback=slv_callback)
+    slv.destroy()
     
     if DBG:
         print("    solutions: %d" % (solutions))
+        
     return solutions
 
 class Solver_sum_Binary(unittest.TestCase):
@@ -267,7 +270,7 @@ class Solver_sum_Words_withCallback(unittest.TestCase):
         pass
         
     def getHitCounter(self):
-        pass
+        return countSolverHitsWithCallback
 
         
     #def test_01_ab(self):

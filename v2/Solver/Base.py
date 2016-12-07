@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import collections
 
 class Base(object):
     def __init__(self):
@@ -31,7 +32,13 @@ class Base(object):
         
     def solve(self):
         pass
-        
+    
+    def initialize(self):
+        pass    
+    
+    def destroy(self):
+        print(self.stats)
+        pass    
         
     def print_tbuf(self, tbuf):
         s = "tbuf:"
@@ -54,3 +61,15 @@ class Base(object):
         
         s+= "    (%d)" % (sum)
         return s
+        
+ 
+
+#class CallbackResult(object):
+#   __slots__ = ('up', 'skipSibling')
+#   def __init__(self):
+#       self.up = None
+#       self.skipSibling = None
+
+CallbackResult = collections.namedtuple('CallbackResult', ['up', 'skipSibling', ])    
+CallbackResult.__new__.__defaults__ = (0,) * len(CallbackResult._fields)
+

@@ -2,6 +2,7 @@
 import sys
 
 import Solver.Base
+from Solver.Base import CallbackResult
 
 """
 slow, non-optimal
@@ -66,36 +67,56 @@ class RecursiveOptimized(Solver.Base.Base):
         
     def _found_solution(self, tbuf, depth):
         return self.callback(tbuf, {
-            depth: depth
+            'depth': depth
         })
         
     def _generate_tbuf_fromsum(self, tbuf, sum, offset, cc):
-        if (self.hints['length']-offset)*self.hints['interval'][0]<sum:
-            #print("f.ret: %s" % (self.print_tbuf(tbuf)))
-            return 1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0])
+        if ((self.hints['length']-offset)*self.hints['interval'][0])<sum:
+            #return 1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0])
+            return CallbackResult(1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0]))
         
         tbuf[offset] = self.hints['interval'][1]
         noffset = offset+1
-        for c in range(min(self.hints['interval'][0], sum, cc), self.hints['interval'][1]-1, -1):
+        
+        """
+            use either
+                for c in range(min(self.hints['interval'][0], sum, cc), self.hints['interval'][1]-1, -1):
+                    ....
+            or
+                c = min(self.hints['interval'][0], sum, cc)+1
+                cmin = self.hints['interval'][1]
+                while c > cmin:
+                    c-=1
+                    ....
+
+        """
+        
+        c = min(self.hints['interval'][0], sum, cc) + 1
+        cmin = self.hints['interval'][1]
+        while c > cmin:
+            c-=1
             tbuf[offset] = c
             nsum = sum-c
-            if nsum==0:
-                #print("match: %s" % (self.print_tbuf(tbuf)))
+            if nsum==0:  # match found
                 r = self._found_solution(tbuf, offset)
                 if r:
-                    if r['return']:
-                        return r['return']
+                    if r.up>0:
+                        return CallbackResult(r.up-1, r.skipSibling)
+                        
+                    if r.skipSibling>0:
+                        c = max(c-r.skipSibling, cmin)
             else:
                 if noffset<self.hints['length']:
                     # check childs
                     r = self._generate_tbuf_fromsum(tbuf, nsum, noffset, c)
-                    if r>0:
-                        tbuf[offset] = self.hints['interval'][1]
-                        return r-1
+                    if r:
+                        if r.up>0:
+                            tbuf[offset] = self.hints['interval'][1]
+                            return CallbackResult(r.up-1, r.skipSibling)
+                            
+                        if r.skipSibling>0:
+                            c = max(c-r.skipSibling, cmin)
                 else:
-                    tbuf[offset] = self.hints['interval'][1]
-                    return 0
-        
-        #print("retur: %s" % (self.print_tbuf(tbuf)))
-        tbuf[offset] = self.hints['interval'][1]
-        return 0
+                    break
+        tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+        return None
