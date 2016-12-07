@@ -6,17 +6,10 @@ import Tests.Base
 
 import Solver.sum
 import Solver.sumAndMD5
-import Solver.sumAndMedian
+#import Solver.sumAndMedian
 
 """
-    >>>py ./test.py -v 2>&1 >test_04_x.log
-    
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_02_x >test_vs.log
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_03_x >test_vs.log
-    py ./test.py -v Solver_sum_V3_1_vs_V1.test_04_x >test_vs.log
-    
-    
-    py ./test.py -v Solver_sum_V1_3.test_6_s_623
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_06_10_rrnmeeeaaa
 """
 
 class Solver_sum_Recursive(Tests.Base.Solver_sum_Binary):
