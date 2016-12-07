@@ -70,13 +70,17 @@ class RecursiveOptimized(Solver.Base.Base):
             'depth': depth
         })
         
+    def _computeLimits(self, sum, offset, cc):
+        return (
+            None,
+            min(self.hints['interval'][0], sum, cc), 
+            self.hints['interval'][1]
+        )
+        
     def _generate_tbuf_fromsum(self, tbuf, sum, offset, cc):
         if ((self.hints['length']-offset)*self.hints['interval'][0])<sum:
             #return 1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0])
             return CallbackResult(1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0]))
-        
-        tbuf[offset] = self.hints['interval'][1]
-        noffset = offset+1
         
         """
             use either
@@ -91,10 +95,16 @@ class RecursiveOptimized(Solver.Base.Base):
 
         """
         
-        c = min(self.hints['interval'][0], sum, cc) + 1
-        cmin = self.hints['interval'][1]
+        (r, c, cmin) = self._computeLimits(sum, offset, cc)
+        if r:
+            if r.up>0:
+                return CallbackResult(r.up-1, r.skipSibling)
+
+        cmin-=1
+        tbuf[offset] = cmin
+        noffset = offset+1
+        
         while c > cmin:
-            c-=1
             tbuf[offset] = c
             nsum = sum-c
             if nsum==0:  # match found
@@ -118,5 +128,6 @@ class RecursiveOptimized(Solver.Base.Base):
                             c = max(c-r.skipSibling, cmin)
                 else:
                     break
+            c-=1
         tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return None

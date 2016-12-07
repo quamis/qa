@@ -51,3 +51,27 @@ class V1(Solver.Base.Base):
                 #return CallbackResult(params['depth'] - self.middleIndex)
                 #return CallbackResult(params['depth'] - self.middleIndex, self.hints['median'] - md+1) # "optimized"
                 return CallbackResult(params['depth'] - self.middleIndex, md - self.hints['median']-1) # "optimized"
+
+                
+class Optimized(Solver.sum.RecursiveOptimized):
+    def __init__(self):
+        super(Optimized, self).__init__()
+        self.callback = None
+        self.hints['median'] = None
+        self.middleIndex = None
+        
+    def solve(self, callback=None):
+        self.middleIndex = self.hints['length']//2
+        return super(Optimized, self).solve(callback=callback)
+        
+    def _computeLimits(self, sum, offset, cc):
+        if offset==self.middleIndex:
+            if cc<self.hints['median']:
+                return (CallbackResult(1), None, None)
+                
+            return(
+                None,
+                self.hints['median'],
+                self.hints['median']
+            )
+        return super(Optimized, self)._computeLimits(sum, offset, cc)

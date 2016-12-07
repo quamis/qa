@@ -13,7 +13,9 @@ import Solver.sumAndMD5
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_06_10_rrnmeeeaaa
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_16_10_srrrpnmieeeeeaaa
     
-    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian.test_06_10_rrnmeeeaaa
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian_V1.test_06_10_rrnmeeeaaa
+    
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized.test_06_10_rrnmeeeaaa
 
 """
 
@@ -94,7 +96,7 @@ class Solver_sum_RecursiveOptimized_withInterval(Tests.Base.Solver_sum_Words_wit
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61))), 1)
         
         
-class Solver_sum_RecursiveOptimized_withInterval_withMedian(Tests.Base.Solver_sum_Words_withCallback):
+class Solver_sum_RecursiveOptimized_withInterval_withMedian_V1(Tests.Base.Solver_sum_Words_withCallback):
     def getSolver(self, len, sum, interval, median):
         slv = Solver.sumAndMedian.V1()
         
@@ -110,6 +112,31 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian(Tests.Base.Solver_su
             7.1s, {'md': {'>': 11712, '<': 3438, '=': 18393, }}
             6.2s, {'md': {'>': 4746,  '<': 3438, '=': 18393, }}
             5.7s, {'md': {'>': 4746,  '<': 3181, '=': 18393, }}
+    """
+    def test_06_10_rrnmeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x65)), 1)
+    
+    """
+        python 3.5:
+            978.9s, {'md': {'>': 114939, '<': 15868, '=': 386149, }}
+    """
+    def test_16_10_srrrpnmieeeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x65)), 1)
+        
+class Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized(Tests.Base.Solver_sum_Words_withCallback):
+    def getSolver(self, len, sum, interval, median):
+        slv = Solver.sumAndMedian.Optimized()
+        
+        # min width: 4+4+2+1 = 11
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('interval', (max(interval), min(interval)))
+        slv.setHint('median', median)
+        return slv
+        
+    """
+        python 3.5:
+            1.5s
     """
     def test_06_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x65)), 1)
