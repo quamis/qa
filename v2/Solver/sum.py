@@ -55,13 +55,13 @@ class RecursiveOptimized(Solver.Base.Base):
     
     def solve(self, callback=None):
         # temporary data buffer
-        tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
+        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
         self.callback = callback
         
         if self.hints['sum']==0:
             self._found_solution(tbuf)
         else:
-            self._generate_tbuf_fromsum(tbuf, self.hints['sum'], 0, self.hints['interval'][0])
+            self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0])
         
         self.callback = None
         
@@ -77,11 +77,11 @@ class RecursiveOptimized(Solver.Base.Base):
             self.hints['interval'][1]
         )
         
-    def _generate_tbuf_fromsum(self, tbuf, sum, offset, cc):
+    def _generate_tbuf_fromsum(self, sum, offset, cc):
         if ((self.hints['length']-offset)*self.hints['interval'][0])<sum:
             #return 1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0])
             return CallbackResult(1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0]))
-        
+
         """
             use either
                 for c in range(min(self.hints['interval'][0], sum, cc), self.hints['interval'][1]-1, -1):
@@ -101,14 +101,14 @@ class RecursiveOptimized(Solver.Base.Base):
                 return CallbackResult(r.up-1, r.skipSibling)
 
         cmin-=1
-        tbuf[offset] = cmin
+        self.tbuf[offset] = cmin
         noffset = offset+1
         
         while c > cmin:
-            tbuf[offset] = c
+            self.tbuf[offset] = c
             nsum = sum-c
             if nsum==0:  # match found
-                r = self._found_solution(tbuf, offset)
+                r = self._found_solution(self.tbuf, offset)
                 if r:
                     if r.up>0:
                         return CallbackResult(r.up-1, r.skipSibling)
@@ -118,10 +118,10 @@ class RecursiveOptimized(Solver.Base.Base):
             else:
                 if noffset<self.hints['length']:
                     # check childs
-                    r = self._generate_tbuf_fromsum(tbuf, nsum, noffset, c)
+                    r = self._generate_tbuf_fromsum(nsum, noffset, c)
                     if r:
                         if r.up>0:
-                            tbuf[offset] = self.hints['interval'][1]
+                            self.tbuf[offset] = self.hints['interval'][1]
                             return CallbackResult(r.up-1, r.skipSibling)
                             
                         if r.skipSibling>0:
@@ -129,5 +129,5 @@ class RecursiveOptimized(Solver.Base.Base):
                 else:
                     break
             c-=1
-        tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+        self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return None

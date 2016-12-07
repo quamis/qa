@@ -87,7 +87,7 @@ class Solver_sum_RecursiveOptimized_withInterval(Tests.Base.Solver_sum_Words_wit
         
     """
         python 3.5:
-            9.3-10.3s
+            9.3-11.0s
     """
     def test_06_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61))), 1)
@@ -112,6 +112,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian_V1(Tests.Base.Solver
             7.1s, {'md': {'>': 11712, '<': 3438, '=': 18393, }}
             6.2s, {'md': {'>': 4746,  '<': 3438, '=': 18393, }}
             5.7s, {'md': {'>': 4746,  '<': 3181, '=': 18393, }}
+            6.7s, after "abstractization", for the Optimized version
     """
     def test_06_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x65)), 1)
