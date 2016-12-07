@@ -143,7 +143,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized(Tests.Base
     
     """
         python 3.5:
-            978.9s, {'md': {'>': 114939, '<': 15868, '=': 386149, }}
+            260s
     """
     def test_16_10_srrrpnmieeeeeaaa(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x65)), 1)
