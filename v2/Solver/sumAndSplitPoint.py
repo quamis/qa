@@ -53,14 +53,14 @@ class Optimized(Solver.sum.RecursiveOptimized):
             return(
                 None,
                 min(self.hints['interval'][0], sum, cc), 
-                self.hints['value']+1
+                self.hints['value']
             )
             
         elif self.indexMap[offset]==49:
             return(
                 None,
                 min(self.hints['interval'][0], sum, cc), 
-                self.hints['value']+1
+                self.hints['value']
             )
             
         elif self.indexMap[offset]==50:
@@ -73,7 +73,7 @@ class Optimized(Solver.sum.RecursiveOptimized):
         elif self.indexMap[offset]==51:
             return(
                 None,
-                min(self.hints['value']-1, sum, cc)-1,
+                min(self.hints['value']-1, sum, cc),
                 self.hints['interval'][1]
             )
             

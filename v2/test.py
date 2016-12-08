@@ -93,7 +93,7 @@ class Solver_sum_RecursiveOptimized_withInterval(Tests.Base.Solver_sum_Words_wit
         python 3.5:
             9.3-11.0s
     """
-    def test_06_10_rrnmeeeaaa(self):
+    def test_10_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61))), 1)
         
     def test_16_10_srrrpnmieeeeeaaa(self):
@@ -118,7 +118,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian_V1(Tests.Base.Solver
             5.7s, {'md': {'>': 4746,  '<': 3181, '=': 18393, }}
             6.7s, after "abstractization", for the Optimized version
     """
-    def test_06_10_rrnmeeeaaa(self):
+    def test_10_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x65)), 1)
     
     """
@@ -143,7 +143,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized(Tests.Base
         python 3.5:
             1.5s
     """
-    def test_06_10_rrnmeeeaaa(self):
+    def test_10_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x65)), 1)
     
     """
@@ -159,7 +159,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     def getSolver(self, len, sum, interval, index, value):
         slv = Solver.sumAndSplitPoint.Optimized()
         
-        # min width: 4+4+2+1 = 11
+        # min width: 4+4+2+1+1 = 12
         slv.setHint('length', len)
         slv.setHint('sum', sum)
         slv.setHint('interval', (max(interval), min(interval)))
@@ -170,11 +170,46 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
         
     """
         python 3.5:
-            1.0s
-            0.5s
+            1.14
     """
-    def test_06_10_rrnmeeeaaa(self):
+    def test_10_10_rrnmeeeaaa(self):
         self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x03, 0x6d)), 1)
+    
+    """
+        python 3.5:
+            0.4
+    """
+    def test_12_10_lkjihgfedcba(self):
+        self.assertEqual(self.getHitCounter()('lkjihgfedcba'.encode('utf-8'), self.getSolver(12, 1230, (0x6c, 0x61), 0x06, 0x66)), 1)
+    
+    """
+        python 3.5:
+            0.0
+    """    
+    def test_12_11_ggggggdddaaa(self):
+        self.assertEqual(self.getHitCounter()('ggggggdddaaa'.encode('utf-8'), self.getSolver(12, 1209, (0x67, 0x61), 0x05, 0x67)), 1)
+        
+        
+    """
+        python 3.5:
+            22s
+    """
+    def test_12_12_urponneeebaa(self):
+        self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x05, 0x6e)), 1)
+    
+    """
+        python 3.5:
+            32s
+    """
+    def test_12_12_urponneeebaa_v2(self):
+        self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x03, 0x6f)), 1)
+        
+    """
+        python 3.5:
+            36s
+    """
+    def test_12_12_urponneeebaa_v3(self):
+        self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x08, 0x65)), 1)
     
     """
         python 3.5:
@@ -182,6 +217,12 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     """
     def test_16_10_srrrpnmieeeeeaaa(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07, 0x69)), 1)
+    
+    def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa(self):
+        self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24, 0x61)), 1)
+        
+        
+        
         
 """
 class Solver_sumAndMedian_V1(unittest.TestCase):
