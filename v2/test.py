@@ -6,6 +6,7 @@ import Tests.Base
 
 import Solver.sum
 import Solver.sumAndMedian
+import Solver.sumAndSplitPoint
 import Solver.sumAndMD5
 
 
@@ -16,6 +17,9 @@ import Solver.sumAndMD5
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian_V1.test_06_10_rrnmeeeaaa
     
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized.test_06_10_rrnmeeeaaa
+    
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_06_10_rrnmeeeaaa
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_16_10_srrrpnmieeeeeaaa
 
 """
 
@@ -148,6 +152,36 @@ class Solver_sum_RecursiveOptimized_withInterval_withMedian_Optimized(Tests.Base
     """
     def test_16_10_srrrpnmieeeeeaaa(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x65)), 1)
+        
+        
+        
+class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.Base.Solver_sum_Words_withCallback):
+    def getSolver(self, len, sum, interval, index, value):
+        slv = Solver.sumAndSplitPoint.Optimized()
+        
+        # min width: 4+4+2+1 = 11
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('interval', (max(interval), min(interval)))
+        slv.setHint('index', index)
+        slv.setHint('value', value)
+        
+        return slv
+        
+    """
+        python 3.5:
+            1.0s
+            0.5s
+    """
+    def test_06_10_rrnmeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('rrnmeeeaaa'.encode('utf-8'), self.getSolver(10, 1041, (0x72, 0x61), 0x03, 0x6d)), 1)
+    
+    """
+        python 3.5:
+            118s
+    """
+    def test_16_10_srrrpnmieeeeeaaa(self):
+        self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07, 0x69)), 1)
         
 """
 class Solver_sumAndMedian_V1(unittest.TestCase):
