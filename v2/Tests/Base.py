@@ -1,5 +1,7 @@
 import unittest
 
+from Solver.Base import CallbackResult
+
 """
     >>>py ./test.py -v 2>&1 >test_04_x.log
     
@@ -60,6 +62,9 @@ def countSolverHitsWithCallback(match, slv):
             print("    %s" % slv.print_buf_as_str(buf))
             global solutions
             solutions+=1
+            
+            # fast-return. as a final optimization
+            #return (CallbackResult(len(buf)), None, None)
         
    
     if DBG:
