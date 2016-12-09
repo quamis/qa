@@ -1,4 +1,4 @@
-import sys, time, hashlib, zlib, os
+import sys, time, hashlib, zlib, os, string
 import argparse
 from termcolor import colored
 
@@ -8,6 +8,11 @@ parser.add_argument('--file',    dest='file',	action='store', type=str,   defaul
 parser.add_argument('-v',        dest='verbose', action='store', type=int,   default=0,   help='TODO')
 args = vars(parser.parse_args())
 
+def print_char(ch):
+    if chr(ch) in string.ascii_letters or chr(ch) in string.digits:
+        return ("%c" % (ch))
+    else:
+        return ("?")
 
 if __name__ == '__main__':
     print("Input string characteristics")
@@ -29,20 +34,18 @@ if __name__ == '__main__':
     
     sbytes = sorted(bytearray(bytes), reverse=True)
 
-    #gbytes = {}
-    #for ch in range(min(bytes), max(bytes)+1, 1):
-    #    gbytes[ch] = 0
-    #for ch in bytes:
-    #    if not ch in gbytes:
-    #        gbytes[ch] = 0
-    #    gbytes[ch]+= 1
+    gbytes = {}
+    for ch in range(min(bytes), max(bytes)+1, 1):
+        gbytes[ch] = 0
+    for ch in bytes:
+        gbytes[ch]+= 1
         
     ###########################################
     
     if args['verbose']>1:
-        print("    as sorted str:    %s" % ( ' '.join( colored("%s" % (chr(c)), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
+        print("    as sorted str:    %s" % ( ' '.join( colored("%s" % (print_char(c)), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
         print("    as sorted hex: 0x%s" % ( ''.join( colored("%02x" % (c), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
-        print("       sorted str:   '%s'" % ( ''.join( colored("%s" % (chr(c)), 'white') for (i, c) in enumerate(sbytes))))
+        print("       sorted str:   '%s'" % ( ''.join( colored("%s" % (print_char(c)), 'white') for (i, c) in enumerate(sbytes))))
     
     
     print("    --length=%d" % (len(bytes)))
@@ -65,16 +68,16 @@ if __name__ == '__main__':
     if args['verbose']>2:
         print("-" * 40)
         for s in spoints:
-            print("    > %c (0x%02x) @%02d   diff:%d score:%.3f" % (s[3], s[3], s[2], s[1], s[0]))
+            print("    > %s (0x%02x) @%02d   diff:%d score:%.3f" % (print_char(s[3]), s[3], s[2], s[1], s[0]))
         
     spoints = sorted(spoints, key=lambda sp: sp[0], reverse=True)
     
     #print("-" * 40)
     #for s in spoints:
-    #    print("    > %c @%02d   diff:%d score:%.3f" % (s[3], s[2], s[1], s[0]))
+    #    print("    > %s @%02d   diff:%d score:%.3f" % (print_char(s[3]), s[2], s[1], s[0]))
     
     spoint = spoints[0]
-    print("    --splitPoint=0x%02x,0x%02x (@%d, %c)" % (spoint[2], spoint[3], spoint[2], spoint[3], ))
+    print("    --splitPoint=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
     print("        depends on sum, optimization hint, ordering:False, len:2b")
     print("        like median, but not necessarily in the middle, but at a split point.")
     if args['verbose']>1:
@@ -102,17 +105,33 @@ if __name__ == '__main__':
     print("    --sha1=%s" % (h.hexdigest()))
     print("        speed:7, ordering:True")
 
+    dct = list(set(bytes))
+    dct.sort(reverse=True)
+    sd = ''.join("%s" % (print_char(x)) for x in dct)
+    if len(sd)<16 or args['verbose']>0:
+        print("    --dictionary='%s'" % (sd))
+        print("        %db" % len(sd))
+    #print("    --dictionary='%s'" % (''.join("0x%2x" % (x) for x in dct)))
     
     print("\n    %s" % ("~" * 40))
     print("    --interval=(0x%02x,0x%02x)" % (max(bytes), min(bytes)))
     print("        %d chars, len:2b" % (max(bytes) - min(bytes)))
+
+    intervalIslands = []
+    pch = min(sbytes)-1
+    for ch in gbytes:
+        if (ch-1) in gbytes and gbytes[ch-1]!=0 and gbytes[ch]==0:
+            intervalIslands.append((pch+1, ch-1))
+            pch=ch
+        elif gbytes[ch]==0:
+            pch=ch
+    intervalIslands.append((pch+1, max(sbytes)))
+    print("    --intervalIslands=%s" % (intervalIslands))
+    print("        %d chars, len:2b" % (max(bytes) - min(bytes)))
     
     if args['verbose']>1:
-        dct = list(set(bytes))
-        dct.sort(reverse=True)
-        sd = ''.join("%s" % (chr(x)) for x in dct)
-        print("    --dictionary='%s'" % (sd))
-        print("        %db" % len(sd))
-    #print("    --dictionary='%s'" % (''.join("0x%2x" % (x) for x in dct)))
+        print("    --charCountDistribution:")
+        for ch in range(0x00, 0xff+1, 1):
+            print("        > %s (0x%02x) % 9d" % (print_char(ch), ch, gbytes[ch] if ch in gbytes else 0))
     
     print("\n    %s" % ("~" * 40))
