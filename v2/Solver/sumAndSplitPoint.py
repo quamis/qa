@@ -3,7 +3,7 @@ import Solver.Base
 import Solver.sum
 from Solver.Base import CallbackResult
 
-class Optimized(Solver.sum.RecursiveOptimized):
+class Optimized(Solver.sum.RecursiveOptimized_V2):
     def __init__(self):
         super(Optimized, self).__init__()
         self.callback = None

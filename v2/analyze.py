@@ -1,4 +1,4 @@
-import sys, time, hashlib, zlib, os, string
+import sys, time, hashlib, zlib, os, string, re
 import argparse
 from termcolor import colored
 
@@ -9,10 +9,13 @@ parser.add_argument('-v',        dest='verbose', action='store', type=int,   def
 args = vars(parser.parse_args())
 
 def print_char(ch):
-    if chr(ch) in string.ascii_letters or chr(ch) in string.digits:
-        return ("%c" % (ch))
-    else:
+    #if chr(ch) in string.ascii_letters or chr(ch) in string.digits:
+    if re.match(r"[a-zA-Z0-9 .,!]", chr(ch)) is None:
         return ("?")
+    else:
+        return ("%c" % (ch))
+        
+        
 
 if __name__ == '__main__':
     print("Input string characteristics")
