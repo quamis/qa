@@ -52,6 +52,10 @@ class RecursiveOptimized(Solver.Base.Base):
         super(RecursiveOptimized, self).__init__()
         self.callback = None
         self.hints['interval'] = (0xff, 0x00)
+        
+        self.stats['_generate_tbuf_fromsum::maxReports'] = 500000
+        self.stats['_generate_tbuf_fromsum::reports'] = self.stats['_generate_tbuf_fromsum::maxReports']
+        
     
     def solve(self, callback=None):
         # temporary data buffer
@@ -81,7 +85,7 @@ class RecursiveOptimized(Solver.Base.Base):
         if ((self.hints['length']-offset)*self.hints['interval'][0])<sum:
             #return 1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0])
             return CallbackResult(1+((sum - ((self.hints['length']-offset-1)*self.hints['interval'][0]))//self.hints['interval'][0]))
-
+            
         """
             use either
                 for c in range(min(self.hints['interval'][0], sum, cc), self.hints['interval'][1]-1, -1):
@@ -103,6 +107,13 @@ class RecursiveOptimized(Solver.Base.Base):
         cmin-=1
         self.tbuf[offset] = cmin
         noffset = offset+1
+        
+        # DEBUGGING
+        if self.stats['_generate_tbuf_fromsum::reports']<0:
+            sys.stdout.write("\n %s" % (self.print_buf_as_str(self.tbuf)))
+            sys.stdout.flush()
+            self.stats['_generate_tbuf_fromsum::reports']=self.stats['_generate_tbuf_fromsum::maxReports']
+        self.stats['_generate_tbuf_fromsum::reports']-=1
         
         while c > cmin:
             self.tbuf[offset] = c

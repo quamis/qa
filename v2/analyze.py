@@ -80,7 +80,7 @@ if __name__ == '__main__':
     print("    --splitPoint=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
     print("        depends on sum, optimization hint, ordering:False, len:2b")
     print("        like median, but not necessarily in the middle, but at a split point.")
-    if args['verbose']>1:
+    if args['verbose']>8:
         print("            Try with abcdefz, should return 'z@0'")
         print("            Try with aaabbbcccfgh, should return 'c@5'")
         print("            Try with abcdefghijklm, should return 'g@6'")
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     print("    --intervalIslands=%s" % (intervalIslands))
     print("        %d chars, len:2b" % (max(bytes) - min(bytes)))
     
-    if args['verbose']>1:
+    if args['verbose']>3:
         print("    --charCountDistribution:")
         for ch in range(0x00, 0xff+1, 1):
             print("        > %s (0x%02x) % 9d" % (print_char(ch), ch, gbytes[ch] if ch in gbytes else 0))

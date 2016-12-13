@@ -20,6 +20,9 @@ import Solver.sumAndMD5
     
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_06_10_rrnmeeeaaa
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_16_10_srrrpnmieeeeeaaa
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_16_10_srrrpnmieeeeeaaa_v2
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized.test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa
+    
 
 """
 
@@ -193,6 +196,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     """
         python 3.5:
             22s
+            11.7s
     """
     def test_12_12_urponneeebaa(self):
         self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x05, 0x6e)), 1)
@@ -200,6 +204,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     """
         python 3.5:
             32s
+            13.7s
     """
     def test_12_12_urponneeebaa_v2(self):
         self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x03, 0x6f)), 1)
@@ -207,19 +212,29 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     """
         python 3.5:
             36s
+            15s
     """
     def test_12_12_urponneeebaa_v3(self):
         self.assertEqual(self.getHitCounter()('urponneeebaa'.encode('utf-8'), self.getSolver(12, 1269, (0x75, 0x61), 0x08, 0x65)), 1)
     
     """
         python 3.5:
-            118s
+            118s - de unde e asta scoasa??
+            363s
+            173s
     """
     def test_16_10_srrrpnmieeeeeaaa(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07, 0x69)), 1)
+     
+    # doesn't work, dont know why
+    #def test_16_10_srrrpnmieeeeeaaa_v2(self):
+    #    self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x08, 0x65)), 1)
     
     def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa(self):
         self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24, 0x61)), 1)
+        
+    def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa_v1(self):
+        self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 25, 0x65)), 1)
         
         
         
