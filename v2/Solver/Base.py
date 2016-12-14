@@ -62,6 +62,16 @@ class Base(object):
         s+= "    (%d)" % (sum)
         return s
         
+    def print_buf_as_binarydiff(self, tbuf):
+        s = ""
+        binarydiff = ""
+        lch = tbuf[0]
+        for ch in tbuf:
+            binarydiff+= "%d" % (0 if lch==ch else 1)
+            lch = ch
+        
+        return binarydiff
+        
  
 
 #class CallbackResult(object):

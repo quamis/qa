@@ -28,7 +28,7 @@ class V1(Solver.sumAndSplitPoint.Optimized):
         
         self.callback = None
         
-    def _computeLimits(self, sum, offset, cc):
+    def _computeLimits(self, tsum, offset, cc):
         self.stats['_computeLimits'][self.indexMap[offset]]+=1
         
         if    self.indexMap[offset]==0x1:
@@ -41,28 +41,28 @@ class V1(Solver.sumAndSplitPoint.Optimized):
             if self.hints['binarydiff'][offset]==0:
                 return(
                     None,
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset], 
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset]
+                    cc, 
+                    cc
                 )
             else:
                 return(
                     None,
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset], 
-                    self.hints['value']
+                    min(self.hints['interval'][0], tsum, cc) - self.hints['binarydiff'][offset], 
+                    self.hints['value'] + sum(self.hints['binarydiff'][offset:(self.hints['index'] - offset)]),
                 )
             
         elif self.indexMap[offset]==0x7:
             if self.hints['binarydiff'][offset]==0:
                 return(
                     None,
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset], 
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset]
+                    cc, 
+                    cc
                 )
             else:
                 return(
                     None,
-                    min(self.hints['interval'][0], sum, cc) - self.hints['binarydiff'][offset], 
-                    self.hints['value']
+                    min(self.hints['interval'][0], tsum, cc) - self.hints['binarydiff'][offset], 
+                    self.hints['value'] + sum(self.hints['binarydiff'][offset:(self.hints['index'] - offset)]),
                 )
             
         elif self.indexMap[offset]==0x8:
@@ -76,29 +76,29 @@ class V1(Solver.sumAndSplitPoint.Optimized):
             if self.hints['binarydiff'][offset]==0:
                 return(
                     None,
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset],
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset]
+                    cc,
+                    cc
                 )
 
             else:
                 return(
                     None,
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset],
-                    self.hints['interval'][1]
+                    min(self.hints['value']-1, tsum, cc) - self.hints['binarydiff'][offset],
+                    self.hints['interval'][1] + sum(self.hints['binarydiff'][offset:])
                 )
             
         elif self.indexMap[offset]==0xa:
             if self.hints['binarydiff'][offset]==0:
                 return(
                     None,
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset],
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset]
+                    cc,
+                    cc
                 )
             else:
                 return(
                     None,
-                    min(self.hints['value']-1, sum, cc) - self.hints['binarydiff'][offset],
-                    self.hints['interval'][1]
+                    min(self.hints['value']-1, tsum, cc) - self.hints['binarydiff'][offset],
+                    self.hints['interval'][1] + sum(self.hints['binarydiff'][offset:])
                 )
             
         elif self.indexMap[offset]==0xf:
@@ -139,13 +139,30 @@ class V1(Solver.sumAndSplitPoint.Optimized):
         self.tbuf[offset] = cmin
         noffset = offset+1
         
+        # did binary check failed?
+        #if offset>2 and (self.hints['binarydiff'][offset-1]==0 and self.hints['binarydiff'][offset-2]==0) and (self.tbuf[offset-1]!=self.tbuf[offset-2]):  
+        #    return CallbackResult(3)
+            
         nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
         
         self.stats['_generate_tbuf_fromsum::reports']-=1
         
         while c > cmin:
+            # did binary check failed?
+            if offset>2 and (self.hints['binarydiff'][offset]==0 and self.hints['binarydiff'][offset-1]==0) and (self.tbuf[offset-1]!=c):
+                #c-=1
+                #continue
+                break
+                
+            #if offset>8 and (self.hints['binarydiff'][offset]==0 and self.hints['binarydiff'][offset-1]==1) and (self.tbuf[offset-1]!=c):
+            #    c-=1
+            #    continue
+            #    #break
+            #    #pass
+        
             self.tbuf[offset] = c
             nsum = sum - c
+            
             if (nsum - nsumoffset)==0:  # match found
                 r = self._found_solution(self.tbuf, offset)
                 if r:

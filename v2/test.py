@@ -233,7 +233,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
             151s
              21s - not safe, recOptimiz_V2
     """
-    def test_16_10_srrrpnmieeeeeaaa(self):
+    def test_16_10(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07, 0x69)), 1)
      
     # doesn't work, dont know why
@@ -244,17 +244,14 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
         python 3.5:
            XXXs - not safe, recOptimiz_V2
     """
-    def test_26_10_srrrrpnmmiieeeeeaaaa(self):
+    def test_26_10(self):
         self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61)), 1)
     
-    def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa(self):
-        self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24, 0x61)), 1)
+    # too slow
+    #def test_49_10(self):
+    #    self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24, 0x61)), 1)
     
     
-    def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa_v1(self):
-        self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 25, 0x65)), 1)
-        
-     
         
 class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withXorSum_V1(Tests.Base.Solver_sum_Words_withCallback):
     def getSolver(self, len, sum, interval, index, value, xorsum):
@@ -288,13 +285,13 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withXorSum_V1(Te
         python 3.5:
              XXs
     """
-    def test_16_10_srrrpnmieeeeeaaa(self):
+    def test_16_10(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07,0x69, 0x1f)), 1)
      
-    def test_26_10_srrrrpnmmiieeeeeaaaa(self):
+    def test_26_10(self):
         self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, 0x06)), 1)
     
-    def test_49_10_vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa(self):
+    def test_49_10(self):
         self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24,0x61, 0x64)), 1)
        
         
@@ -316,12 +313,9 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
     def test_04_10(self):
         self.assertEqual(self.getHitCounter()('cbaa'.encode('utf-8'), self.getSolver(4, 391, (0x63, 0x61), 0x02,0x61, (0,1,1,0,))), 1)
 
-    def test_16_10(self):
-        self.assertEqual(self.getHitCounter()('sssrrrpnmieeeeaa'.encode('utf-8'), self.getSolver(16, 1721, (0x73, 0x61), 0x08,0x6d, (0,0,0,1,0,0,1,1,1,1,1,0,0,0,1,0,))), 1)
-        
     """
         python 3.5:
-             XXs
+             0.02s
     """
     def test_16_10(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07,0x69, (0,1,0,0,1,1,1,1,1,0,0,0,0,1,0,0,))), 1)
