@@ -80,6 +80,11 @@ if __name__ == '__main__':
     #    print("    > %s @%02d   diff:%d score:%.3f" % (print_char(s[3]), s[2], s[1], s[0]))
     
     spoint = spoints[0]
+    if spoint[2]==0:
+        spoint = spoints[1]
+    if spoint[2]==len(sbytes)-1:
+        spoint = spoints[1]
+        
     print("    --splitPoint=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
     print("        depends on sum, optimization hint, ordering:False, len:2b")
     print("        like median, but not necessarily in the middle, but at a split point.")

@@ -161,6 +161,16 @@ class V1(Solver.sumAndSplitPoint.Optimized):
             #    continue
             #    #break
             #    #pass
+            
+            if offset>2 and (self.hints['binarydiff'][offset]==1 and self.hints['binarydiff'][offset-1]==1) and (self.tbuf[offset-1]==c):
+            #    c-=1
+            #    continue
+            #    break
+            #    #break
+            #    #pass
+                exit()
+                self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+                return CallbackResult(2)
         
             self.tbuf[offset] = c
             nsum = sum - c

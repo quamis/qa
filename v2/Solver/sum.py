@@ -163,10 +163,10 @@ class RecursiveOptimized_V2(Solver.Base.Base):
         #sys.stdout.write("\n %s (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
         
         # DEBUGGING
-        if self.stats['_generate_tbuf_fromsum::reports']<0:
-            sys.stdout.write("\n %s (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
-            sys.stdout.flush()
-            self.stats['_generate_tbuf_fromsum::reports']=self.stats['_generate_tbuf_fromsum::maxReports']
+        #if self.stats['_generate_tbuf_fromsum::reports']<0:
+        #    sys.stdout.write("\n %s (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
+        #    sys.stdout.flush()
+        #    self.stats['_generate_tbuf_fromsum::reports']=self.stats['_generate_tbuf_fromsum::maxReports']
             
         return self.callback(tbuf, {
             'depth': depth

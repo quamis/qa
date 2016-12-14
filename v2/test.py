@@ -312,6 +312,9 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
         
     def test_04_10(self):
         self.assertEqual(self.getHitCounter()('cbaa'.encode('utf-8'), self.getSolver(4, 391, (0x63, 0x61), 0x02,0x61, (0,1,1,0,))), 1)
+        
+    def test_06_10(self):
+        self.assertEqual(self.getHitCounter()('xdcbaa'.encode('utf-8'), self.getSolver(6, 611, (0x78, 0x61), 0x03,0x62, (0,1,1,1,1,0,))), 1)
 
     """
         python 3.5:
