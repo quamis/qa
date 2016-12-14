@@ -100,6 +100,7 @@ if __name__ == '__main__':
         binarydiff+= "%d" % (0 if lch==ch else 1)
         lch = ch
     print("    --binarydiff=%s" % (binarydiff))
+    print("        (%s)" % (''.join("%s," % (x) for x in binarydiff)))
     print("        %dbits ~ %db" % (len(binarydiff), int(math.ceil(float(len(binarydiff))/8))))
     
     
