@@ -6,8 +6,10 @@ from Solver.Base import CallbackResult
 
 
 """
-    doesn't seem to optimize that much
-    not sure why in some cases it actually skips valid results
+    this class still generates false data, instead of 0100 it will still generate 0110 or something like that. I'm not sure why
+    
+    this should be further optimized, a completly different approach to resolving the input data can be approched by havning the relationships between elements
+    
 """
 class V1(Solver.sumAndSplitPoint.Optimized):
     def __init__(self):
