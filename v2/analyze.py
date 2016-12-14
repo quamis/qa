@@ -1,4 +1,4 @@
-import sys, time, hashlib, zlib, os, string, re
+import sys, time, hashlib, zlib, os, string, re, math
 import argparse
 from termcolor import colored
 
@@ -90,9 +90,18 @@ if __name__ == '__main__':
     
     lxor = 0x00
     for ch in bytes:
-        lxor = lxor^ch
-    print("    --xor=0x%02x" % (lxor))
+        lxor = lxor ^ ch
+    print("    --xorsum=0x%02x" % (lxor))
     print("        speed:10, ordering:False, len:1b")
+    
+    binarydiff = ""
+    lch = sbytes[0]
+    for ch in sbytes:
+        binarydiff+= "%d" % (0 if lch==ch else 1)
+        lch = ch
+    print("    --binarydiff=%s" % (binarydiff))
+    print("        %dbits ~ %db" % (len(binarydiff), int(math.ceil(float(len(binarydiff))/8))))
+    
     
     print("\n    %s" % ("~" * 40))
     print("    --crc32=0x%06x" % (zlib.crc32(bytes) & 0xffffffff))

@@ -133,6 +133,8 @@ class RecursiveOptimized(Solver.Base.Base):
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return None
 
+        
+        
 class RecursiveOptimized_V2(Solver.Base.Base):  
     def __init__(self):
         super(RecursiveOptimized_V2, self).__init__()
