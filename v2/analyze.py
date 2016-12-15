@@ -133,7 +133,7 @@ if __name__ == '__main__':
     
     print("\n    %s" % ("~" * 40))
     print("    --interval=(0x%02x,0x%02x)" % (max(bytes), min(bytes)))
-    print("        %d chars, len:2b" % (max(bytes) - min(bytes)))
+    print("        len:2b" % ())
 
     intervalIslands = []
     pch = min(sbytes)-1
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     print("    --intervalIslands=%s" % (intervalIslands))
     print("        %d chars, len:2b" % (max(bytes) - min(bytes)))
     
-    if args['verbose']>3:
+    if args['verbose']>8:
         print("    --charCountDistribution:")
         for ch in range(0x00, 0xff+1, 1):
             print("        > %s (0x%02x) % 9d" % (print_char(ch), ch, gbytes[ch] if ch in gbytes else 0))

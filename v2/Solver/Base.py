@@ -49,17 +49,20 @@ class Base(object):
         
         s+= "    (%d)" % (sum)
         return s
-        
-        
-    def print_buf_as_str(self, tbuf):
-        s = "str:"
-        
+    
+    def print_buf_as_sum(self, tbuf):
         sum = 0
         for i in range(0, len(tbuf)):
-            s+= "%s" % (chr(tbuf[i]))
             sum+=tbuf[i]
         
-        s+= "    (%d)" % (sum)
+        return sum
+        
+    def print_buf_as_str(self, tbuf):
+        s = ""
+        
+        for i in range(0, len(tbuf)):
+            s+= "%s" % (chr(tbuf[i]))
+
         return s
         
     def print_buf_as_binarydiff(self, tbuf):

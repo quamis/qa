@@ -252,7 +252,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_Optimized(Tests.
     #    self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24, 0x61)), 1)
     
     
-        
+# NOT USED
 class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withXorSum_V1(Tests.Base.Solver_sum_Words_withCallback):
     def getSolver(self, len, sum, interval, index, value, xorsum):
         slv = Solver.sumAndSplitPointAndXorSum.V1()
@@ -322,14 +322,90 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
     """
     def test_16_10(self):
         self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07,0x69, (0,1,0,0,1,1,1,1,1,0,0,0,0,1,0,0,))), 1)
-     
+        
     def test_26_10(self):
         self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
+    
+    def test_30_10(self):
+        self.assertEqual(self.getHitCounter()('999888777666555444333222111000'.encode('utf-8'), self.getSolver(30, 1575, (0x39, 0x30), 0x0e,0x35,  (0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,))), 1)
     
     def test_49_10(self):
         self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24,0x61, (0,1,1,1,0,0,0,1,0,0,0,0,1,1,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,))), 1)
        
+
+class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V2(Tests.Base.Solver_sum_Words_withCallback):
+    def getSolver(self, len, sum, interval, index, value, binarydiff):
+        slv = Solver.sumAndSplitPointAndBinaryDiff.V2()
         
+        # min width: 4+4+2+1+1 = 12
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('interval', (max(interval), min(interval)))
+        slv.setHint('index', index)
+        slv.setHint('value', value)
+        slv.setHint('binarydiff', binarydiff)
+        
+        return slv
+        
+    def test_04_10(self):
+        self.assertEqual(self.getHitCounter()('cbaa'.encode('utf-8'), self.getSolver(4, 391, (0x63, 0x61), 0x02,0x61, (0,1,1,0,))), 1)
+        
+    def test_06_10(self):
+        self.assertEqual(self.getHitCounter()('xdcbaa'.encode('utf-8'), self.getSolver(6, 611, (0x78, 0x61), 0x03,0x62, (0,1,1,1,1,0,))), 1)
+    
+    """
+        python 3.5:
+             0.03s
+    """
+    def test_16_10(self):
+        self.assertEqual(self.getHitCounter()('srrrpnmieeeeeaaa'.encode('utf-8'), self.getSolver(16, 1689, (0x73, 0x61), 0x07,0x69, (0,1,0,0,1,1,1,1,1,0,0,0,0,1,0,0,))), 1)
+
+    """
+        python 3.5:
+             0.01s
+    """        
+    def test_16_11(self):
+        self.assertEqual(self.getHitCounter()('zaaaaaaaaaaaaaaa'.encode('utf-8'), self.getSolver(16, 1577, (0x7a,0x61), 0x08,0x61, (0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,))), 1)
+        
+    """
+        python 3.5:
+             0.041s
+    """
+    def test_16_12(self):
+        """ 
+            --splitPoint=0x08,0x64 (@8, d)
+                                     'zjihgfeeddccbaaa'
+            --binarydiff              0111111010101100
+              offsets                 0123456789012345
+            -> binaryDiffRSums        aa98765443322100
+                                      .......|^|......
+
+        """
+        self.assertEqual(self.getHitCounter()('zjihgfeeddccbaaa'.encode('utf-8'), self.getSolver(16, 1631, (0x7a,0x61), 0x08,0x64, (0,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,))), 1)
+    
+    """
+        python 3.5:
+            1.630s
+    """
+    def test_16_13(self):
+        self.assertEqual(self.getHitCounter()('zyxvutsqomkigeca'.encode('utf-8'), self.getSolver(16, 1774, (0x7a,0x61), 0x08,0x6f, (0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))), 1)
+    
+    """
+        python 3.5:
+            23.0s
+    """
+    def test_16_15(self):
+        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+     
+    def test_26_10(self):
+        self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
+    
+    def test_30_10(self):
+        self.assertEqual(self.getHitCounter()('999888777666555444333222111000'.encode('utf-8'), self.getSolver(30, 1575, (0x39, 0x30), 0x0e,0x35,  (0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,))), 1)
+    
+    def test_49_10(self):
+        self.assertEqual(self.getHitCounter()('vutssssrrrrrpnnnmmiiiiieeeeeeebaaaaaa?.          '.encode('utf-8'), self.getSolver(49, 4382, (0x76, 0x20), 0x24,0x61, (0,1,1,1,0,0,0,1,0,0,0,0,1,1,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,))), 1)
+       
         
 """
 class Solver_sumAndMedian_V1(unittest.TestCase):
