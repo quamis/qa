@@ -407,7 +407,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
         # the splitpoint analizer fails for this case. It should return something different
         #self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
         #self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 13,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
-        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 12,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 11,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
      
     #def test_26_10(self):
     #    self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
