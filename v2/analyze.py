@@ -99,14 +99,20 @@ if __name__ == '__main__':
     print("    --xorsum=0x%02x" % (lxor))
     print("        speed:10, ordering:False, len:1b")
     
-    binarydiff = ""
+    binarydiff = []
     lch = sbytes[0]
     for ch in sbytes:
-        binarydiff+= "%d" % (0 if lch==ch else 1)
+        binarydiff.append(0 if lch==ch else 1)
         lch = ch
-    print("    --binarydiff=%s" % (binarydiff))
+    print("    --binarydiff=%s" % ((''.join("%d" % (x) for x in binarydiff))))
     print("        (%s)" % (''.join("%s," % (x) for x in binarydiff)))
     print("        %dbits ~ %db" % (len(binarydiff), int(math.ceil(float(len(binarydiff))/8))))
+    
+    binaryDiffRSums = []
+    for (offset, v) in enumerate(binarydiff):
+        binaryDiffRSums.append(sum(binarydiff[offset:]))
+            
+    print("        binaryDiffRSums=hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSums))))
     
     
     print("\n    %s" % ("~" * 40))

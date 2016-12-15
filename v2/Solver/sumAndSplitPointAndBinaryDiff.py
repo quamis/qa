@@ -339,38 +339,28 @@ class V2(Solver.Base.Base):
                 )
                 
     def _generate_tbuf_fromsum(self, sum, offset, cc):
-        # optimization. this might induce too many skipped steps, but it seems to work ok for now
-        # thse checks should be done after _computeLimits?
+        noffset = offset+1
+        nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
         
-        # TODO: review this optimization
-        #if ((self.hints['length'] - offset)*cc)<sum:
-        #    return CallbackResult(0)
-            
-        if ((self.hints['length'] - offset)*self.hints['interval'][1])>sum:
+        # optimization
+        # thse checks should be done after _computeLimits? or even taken into consideration in _computeLimits?
+        if ((self.hints['length'] - offset)*self.hints['interval'][1])>(sum):
             return CallbackResult(0)
-        
-        #if ((self.hints['length'] - offset-1)*self.hints['interval'][1])>sum:
-        #    return CallbackResult(0)
             
         (r, c, cmin) = self._computeLimits(sum, offset, cc)
         if r:
             if r.up>0:
                 return CallbackResult(r.up-1, r.skipSibling)
-
-        cmin-=1
+                
+        cmin-= 1
         self.tbuf[offset] = cmin
-        noffset = offset+1
-        
-        nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
-        
-        self.stats['_generate_tbuf_fromsum::reports']-=1
-        
+
         while c > cmin:
             self.tbuf[offset] = c
             nsum = sum - c
             
             if noffset==(self.hints['length']-1):
-                if nsum - nsumoffset==0:
+                if (nsum - nsumoffset)==0:
                     r = self._found_solution(self.tbuf, offset)
                     if r:
                         if r.up>0:
