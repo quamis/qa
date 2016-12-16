@@ -386,6 +386,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
     """
         python 3.5:
             1.630s
+            1.84s
     """
     def test_16_13(self):
         self.assertEqual(self.getHitCounter()('zyxvutsqomkigeca'.encode('utf-8'), self.getSolver(16, 1774, (0x7a,0x61), 0x08,0x6f, (0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))), 1)
@@ -394,6 +395,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
         python 3.5:
             20.0s
             9.7s
+            5.5s
     """
     def test_16_15(self):
         """ 
@@ -415,7 +417,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
      
     """
         python 3.5:
-            xx.xs
+            7.1s
     """
     def test_26_10(self):
         """ 
@@ -428,6 +430,25 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
                                       ...................^......
         """
         self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
+    
+    
+    """
+        python 3.5:
+            176s (with diff split point)
+    """
+    def test_26_11(self):
+        """ 
+            --splitPoint=0x15,0x4e (@21, N)
+                                     'vtttssroooniiihfeeddaN    '
+            --binarydiff              01001011001100111010111000
+              offsets                 01234567890123456789012345
+            -> binaryDiffRSums        ddcccbba999877765443321000
+            -> binaryDiffRSumsV2      dcccbba9998777654433210000
+                                      .....................^....
+        """
+        #self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(26, 2479, (0x76,0x20), 0x15,0x4e, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))), 1)
+        self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(26, 2479, (0x76,0x20), 20,ord('a'), (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))), 1)
+    
     
     #def test_30_10(self):
     #    self.assertEqual(self.getHitCounter()('999888777666555444333222111000'.encode('utf-8'), self.getSolver(30, 1575, (0x39, 0x30), 0x0e,0x35,  (0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,))), 1)

@@ -228,7 +228,7 @@ class V2(Solver.Base.Base):
         self.stats['_computeLimits'][0x9] = 0
         self.stats['_computeLimits'][0xa] = 0
         self.stats['_computeLimits'][0xf] = 0
-        self.stats['_generate_tbuf_fromsum::maxReports'] = 500000
+        self.stats['_generate_tbuf_fromsum::maxReports'] = 2000
         self.stats['_generate_tbuf_fromsum::reports'] = self.stats['_generate_tbuf_fromsum::maxReports']
         
     
@@ -257,6 +257,7 @@ class V2(Solver.Base.Base):
         #sys.stdout.flush()
         
         # DEBUGGING
+        #self.stats['_generate_tbuf_fromsum::reports']-=1
         #if self.stats['_generate_tbuf_fromsum::reports']<0:
         #    sys.stdout.write("\n %s (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
         #    sys.stdout.flush()
@@ -266,46 +267,35 @@ class V2(Solver.Base.Base):
             'depth': depth
         })
         
-    def _computeLimits2(self, rsum, offset, cc):
+        
+    def _computeLimits(self, offset, cc):
         if offset==self.hints['index']:
             return (
                 None,
                 self.hints['value'],
                 self.hints['value']
             )
-        
-        if self.hints['binarydiff'][offset]==0:
+
+        # the order of the if's apparently matters
+        if (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['length']-1]):
             return (
                 None,
-                cc,
-                cc
-            )
-        if self.hints['binarydiff'][offset]==1:
-            return (
-                None,
-                cc - 1,
+                self.hints['interval'][1],
                 self.hints['interval'][1]
-                #(self.hints['interval'][1] + self.binaryDiffRSums[offset+1])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
-                #(self.hints['interval'][1] + self.binaryDiffRSums[offset+1])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
-                    # was: cc - sum(self.hints['binarydiff'][offset:]) #cc-1
-            )
-        
-    def _computeLimits(self, rsum, offset, cc):
-        if offset==self.hints['index']:
-            return (
-                None,
-                self.hints['value'],
-                self.hints['value']
-            )
-            
-        if (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['index']]):
-                #sys.stdout.write("\n     %s, %d, %d" % ('<' if offset<self.hints['index'] else '>', offset, self.hints['index']))
-                #sys.stdout.flush()
+            )        
+        elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['index']]):
                 return (
                     None,
                     self.hints['value'],
                     self.hints['value']
                 )
+        elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[0]):
+                return (
+                    None,
+                    self.hints['interval'][0],
+                    self.hints['interval'][0]
+                )
+
         
         if self.hints['binarydiff'][offset]==0:
             return (
@@ -313,22 +303,18 @@ class V2(Solver.Base.Base):
                 cc,
                 cc
             )
-        if self.hints['binarydiff'][offset]==1:
+        elif self.hints['binarydiff'][offset]==1:
             if offset<self.hints['index']:
                 return (
                     None,
                     cc - 1,
-                    #self.hints['interval'][1]
                     self.hints['value'] + (self.binaryDiffRSums[offset] - self.binaryDiffRSums[self.hints['index']]) - 1
                 )
             else:
                 return (
                     None,
                     cc - 1,
-                    #self.hints['interval'][1]
                     (self.hints['interval'][1] + self.binaryDiffRSums[offset+1])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
-                    #(self.hints['interval'][1] + self.binaryDiffRSums[offset+1])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
-                        # was: cc - sum(self.hints['binarydiff'][offset:]) #cc-1
                 )
                 
     def _generate_tbuf_fromsum(self, sum, offset, cc):
@@ -338,16 +324,16 @@ class V2(Solver.Base.Base):
         # optimization
         # thse checks should be done after _computeLimits? or even taken into consideration in _computeLimits?
         if ((self.hints['length'] - offset)*self.hints['interval'][1])>(sum):
-            return CallbackResult(0)
+            return 0
             
-        (r, c, cmin) = self._computeLimits(sum, offset, cc)
+        (r, c, cmin) = self._computeLimits(offset, cc)
         if r:
-            if r.up>0:
-                return CallbackResult(r.up-1, r.skipSibling)
-                
-        cmin-= 1
-        self.tbuf[offset] = cmin
+            return r-1
+        
 
+        cmin-= 1
+        
+        ret = 0
         while c > cmin:
             self.tbuf[offset] = c
             nsum = sum - c
@@ -356,23 +342,76 @@ class V2(Solver.Base.Base):
                 if (nsum - nsumoffset)==0:
                     r = self._found_solution(self.tbuf, offset)
                     if r:
-                        if r.up>0:
-                            self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
-                            return CallbackResult(r.up-1, r.skipSibling)
-                            
-                        if r.skipSibling>0:
-                            c = max(c-r.skipSibling, cmin)
-
+                        ret = r-1
+                        break
             else:                        # noffset<(self.hints['length']-1):, still something to distribuite
                 # check childs
                 r = self._generate_tbuf_fromsum(nsum, noffset, c)
                 if r:
-                    if r.up>0:
-                        self.tbuf[offset] = self.hints['interval'][1]
-                        return CallbackResult(r.up-1, r.skipSibling)
-                        
-                    if r.skipSibling>0:
-                        c = max(c-r.skipSibling, cmin)
+                    ret = r-1
+                    break
             c-=1
+        
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
-        return None
+        return ret
+
+        
+    def _generate_tbuf_fromsum(self, sum, offset, cc):
+        noffset = offset+1
+        nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
+        
+        # optimization
+        # thse checks should be done after _computeLimits? or even taken into consideration in _computeLimits?
+        if ((self.hints['length'] - offset)*self.hints['interval'][1])>(sum):
+            return 0
+            
+        (r, c, cmin) = self._computeLimits(offset, cc)
+        if r:
+            return r-1
+        
+        if noffset>self.hints['index']:
+            cmax = c+1
+            c = cmin
+            
+            ret = 0
+            while c < cmax:
+                self.tbuf[offset] = c
+                nsum = sum - c
+                
+                if noffset==(self.hints['length']-1):
+                    if (nsum - nsumoffset)==0:
+                        r = self._found_solution(self.tbuf, offset)
+                        if r:
+                            ret = r-1
+                            break
+                else:                        # noffset<(self.hints['length']-1):, still something to distribuite
+                    # check childs
+                    r = self._generate_tbuf_fromsum(nsum, noffset, c)
+                    if r:
+                        ret = r-1
+                        break
+                c+=1
+        else:
+            cmin-= 1
+            
+            ret = 0
+            while c > cmin:
+                self.tbuf[offset] = c
+                nsum = sum - c
+                
+                if noffset==(self.hints['length']-1):
+                    if (nsum - nsumoffset)==0:
+                        r = self._found_solution(self.tbuf, offset)
+                        if r:
+                            ret = r-1
+                            break
+                else:                        # noffset<(self.hints['length']-1):, still something to distribuite
+                    # check childs
+                    r = self._generate_tbuf_fromsum(nsum, noffset, c)
+                    if r:
+                        ret = r-1
+                        break
+                c-=1
+        
+        self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+        return ret
