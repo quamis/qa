@@ -206,7 +206,7 @@ class V1(Solver.sumAndSplitPoint.Optimized):
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return None
 
-        
+
 class V2(Solver.Base.Base):  
     def __init__(self):
         super(V2, self).__init__()
@@ -254,7 +254,7 @@ class V2(Solver.Base.Base):
             self.binaryDiffRSumsV2.append(sum(self.hints['binarydiff'][offset+1:]))
             
         
-    def _found_solution(self, tbuf, depth):
+    def _found_solution(self, tbuf):
         self.stats['_found_solution']['calls']+=1
         # DEBUGGING
         #sys.stdout.write("\n ##### '%s' sum:%d (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
@@ -267,9 +267,7 @@ class V2(Solver.Base.Base):
         #    sys.stdout.flush()
         #    self.stats['_generate_tbuf_fromsum::reports']=self.stats['_generate_tbuf_fromsum::maxReports']
             
-        return self.callback(tbuf, {
-            'depth': depth
-        })
+        return self.callback(tbuf, { })
         
         
     def _computeLimits(self, offset, cc):
@@ -354,7 +352,7 @@ class V2(Solver.Base.Base):
             
             if noffset==(self.hints['length']-1):
                 if (nsum - nsumoffset)==0:
-                    r = self._found_solution(self.tbuf, offset)
+                    r = self._found_solution(self.tbuf)
                     if r:
                         ret = r-1
                         break
@@ -394,7 +392,7 @@ class V2(Solver.Base.Base):
                 
                 if noffset==(self.hints['length']-1):
                     if (nsum - nsumoffset)==0:
-                        r = self._found_solution(self.tbuf, offset)
+                        r = self._found_solution(self.tbuf)
                         if r:
                             ret = r-1
                             break
@@ -415,7 +413,7 @@ class V2(Solver.Base.Base):
                 
                 if noffset==(self.hints['length']-1):
                     if (nsum - nsumoffset)==0:
-                        r = self._found_solution(self.tbuf, offset)
+                        r = self._found_solution(self.tbuf)
                         if r:
                             ret = r-1
                             break

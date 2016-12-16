@@ -2,6 +2,7 @@
 import Solver.Base
 import Solver.sum
 import Solver.sumAndSplitPoint
+import Solver.sumAndSplitPointAndBinaryDiff
 from Solver.Base import CallbackResult
 
 
@@ -96,3 +97,72 @@ class V1(Solver.sumAndSplitPoint.Optimized):
             c-=1
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return None
+        
+        
+
+class V2(Solver.sumAndSplitPointAndBinaryDiff.V2):  
+    def __init__(self):
+        super(V2, self).__init__()
+        self.hints['xorsum'] = 0x00
+        
+    
+    def solve(self, callback=None):
+        # temporary data buffer
+        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
+        self.callback = callback
+        
+        if self.hints['sum']==0:
+            self._found_solution(tbuf)
+        else:
+            #self._generate_tbuf_fromsum(self.hints['sum'] - (self.hints['interval'][1]*self.hints['length']), 0, self.hints['interval'][0])
+            self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], 0)
+        
+        self.callback = None
+    
+    
+    def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
+        noffset = offset+1
+        nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
+        
+        # optimization
+        # thse checks should be done after _computeLimits? or even taken into consideration in _computeLimits?
+        if ((self.hints['length'] - offset)*self.hints['interval'][1])>(sum):
+            return 0
+            
+        (r, c, cmin) = self._computeLimits(offset, cc)
+        if r:
+            return r-1
+        
+        
+        if cc<cmin:
+            exit()
+
+        cmin-= 1
+        
+        ret = 0
+        while c > cmin:
+            self.tbuf[offset] = c
+            nsum = sum - c
+            nxorsum = xorsum ^ c
+            
+            if noffset==(self.hints['length']-1):
+                nxorsum = nxorsum ^ self.tbuf[offset+1]
+                if (nsum - nsumoffset)==0:
+                    if nxorsum==self.hints['xorsum']:
+                        r = self._found_solution(self.tbuf, offset)
+                        if r:
+                            ret = r-1
+                            break
+                    else:
+                        break
+            else:                        # noffset<(self.hints['length']-1):, still something to distribuite
+            
+                # check childs
+                r = self._generate_tbuf_fromsum(nsum, noffset, c, nxorsum)
+                if r:
+                    ret = r-1
+                    break
+            c-=1
+        
+        self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+        return ret
