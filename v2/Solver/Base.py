@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
-import collections
+import collections, operator
 
 class Base(object):
     def __init__(self):
@@ -38,7 +38,20 @@ class Base(object):
     
     def destroy(self):
         print(self.stats)
-        pass    
+        
+        if '_computeLimits' in self.stats:
+            _computeLimits = sorted(self.stats['_computeLimits'].items(), key=operator.itemgetter(0))
+            
+            print("_computeLimits" % ())
+            for (k, v) in _computeLimits:
+                print("    %-15s: %7d" % (k, v))
+                
+        if '_found_solution' in self.stats:
+            _found_solution = sorted(self.stats['_found_solution'].items(), key=operator.itemgetter(0))
+            
+            print("_found_solution" % ())
+            for (k, v) in _found_solution:
+                print("    %-15s: %7d" % (k, v))
         
     def print_tbuf(self, tbuf):
         s = "tbuf:"

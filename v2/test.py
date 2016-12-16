@@ -418,6 +418,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
     """
         python 3.5:
             7.1s
+            6.8s
     """
     def test_26_10(self):
         """ 

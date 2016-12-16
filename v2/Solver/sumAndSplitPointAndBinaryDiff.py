@@ -220,14 +220,17 @@ class V2(Solver.Base.Base):
         self.binaryDiffRSums = []
         self.binaryDiffRSumsV2 = []
         
+        self.stats['_found_solution'] = {}
+        self.stats['_found_solution']['calls'] = 0
+        
         self.stats['_computeLimits'] = {}
-        self.stats['_computeLimits'][0x1] = 0
-        self.stats['_computeLimits'][0x6] = 0
-        self.stats['_computeLimits'][0x7] = 0
-        self.stats['_computeLimits'][0x8] = 0
-        self.stats['_computeLimits'][0x9] = 0
-        self.stats['_computeLimits'][0xa] = 0
-        self.stats['_computeLimits'][0xf] = 0
+        self.stats['_computeLimits']['o==i'] = 0
+        self.stats['_computeLimits']['dro==drl'] = 0
+        self.stats['_computeLimits']['dro==i'] = 0
+        self.stats['_computeLimits']['dro==0'] = 0
+        self.stats['_computeLimits']['bdo==0'] = 0
+        self.stats['_computeLimits']['bdo==1, o<i'] = 0
+        self.stats['_computeLimits']['bdo==1, o>=i'] = 0
         self.stats['_generate_tbuf_fromsum::maxReports'] = 2000
         self.stats['_generate_tbuf_fromsum::reports'] = self.stats['_generate_tbuf_fromsum::maxReports']
         
@@ -252,6 +255,7 @@ class V2(Solver.Base.Base):
             
         
     def _found_solution(self, tbuf, depth):
+        self.stats['_found_solution']['calls']+=1
         # DEBUGGING
         #sys.stdout.write("\n ##### '%s' sum:%d (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
         #sys.stdout.flush()
@@ -270,6 +274,7 @@ class V2(Solver.Base.Base):
         
     def _computeLimits(self, offset, cc):
         if offset==self.hints['index']:
+            self.stats['_computeLimits']['o==i']+= 1
             return (
                 None,
                 self.hints['value'],
@@ -278,26 +283,30 @@ class V2(Solver.Base.Base):
 
         # the order of the if's apparently matters
         if (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['length']-1]):
+            self.stats['_computeLimits']['dro==drl']+= 1
             return (
                 None,
                 self.hints['interval'][1],
                 self.hints['interval'][1]
             )        
         elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['index']]):
-                return (
-                    None,
-                    self.hints['value'],
-                    self.hints['value']
-                )
+            self.stats['_computeLimits']['dro==i']+= 1
+            return (
+                None,
+                self.hints['value'],
+                self.hints['value']
+            )
         elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[0]):
-                return (
-                    None,
-                    self.hints['interval'][0],
-                    self.hints['interval'][0]
-                )
+            self.stats['_computeLimits']['dro==0']+= 1
+            return (
+                None,
+                self.hints['interval'][0],
+                self.hints['interval'][0]
+            )
 
         
         if self.hints['binarydiff'][offset]==0:
+            self.stats['_computeLimits']['bdo==0']+= 1
             return (
                 None,
                 cc,
@@ -305,16 +314,18 @@ class V2(Solver.Base.Base):
             )
         elif self.hints['binarydiff'][offset]==1:
             if offset<self.hints['index']:
+                self.stats['_computeLimits']['bdo==1, o<i']+= 1
                 return (
                     None,
                     cc - 1,
-                    self.hints['value'] + (self.binaryDiffRSums[offset] - self.binaryDiffRSums[self.hints['index']]) - 1
+                    self.hints['value'] + (self.binaryDiffRSumsV2[offset] - self.binaryDiffRSumsV2[self.hints['index']])
                 )
             else:
+                self.stats['_computeLimits']['bdo==1, o>=i']+= 1
                 return (
                     None,
                     cc - 1,
-                    (self.hints['interval'][1] + self.binaryDiffRSums[offset+1])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
+                    (self.hints['interval'][1] + self.binaryDiffRSumsV2[offset])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
                 )
                 
     def _generate_tbuf_fromsum(self, sum, offset, cc):
@@ -330,6 +341,9 @@ class V2(Solver.Base.Base):
         if r:
             return r-1
         
+        
+        if cc<cmin:
+            exit()
 
         cmin-= 1
         
@@ -355,8 +369,8 @@ class V2(Solver.Base.Base):
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return ret
 
-        
-    def _generate_tbuf_fromsum(self, sum, offset, cc):
+    """
+    def _generate_tbuf_fromsum_reversed(self, sum, offset, cc):
         noffset = offset+1
         nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
         
@@ -415,3 +429,4 @@ class V2(Solver.Base.Base):
         
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return ret
+    """
