@@ -45,7 +45,7 @@ if __name__ == '__main__':
         
     ###########################################
     
-    if args['verbose']>1:
+    if args['verbose']>0:
         print("    as sorted str:    %s" % ( ' '.join( colored("%s" % (print_char(c)), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
         print("    as sorted hex: 0x%s" % ( ''.join( colored("%02x" % (c), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, c) in enumerate(sbytes))))
         print("       sorted str:   '%s'" % ( ''.join( colored("%s" % (print_char(c)), 'white') for (i, c) in enumerate(sbytes))))
@@ -108,11 +108,15 @@ if __name__ == '__main__':
     print("        (%s)" % (''.join("%s," % (x) for x in binarydiff)))
     print("        %dbits ~ %db" % (len(binarydiff), int(math.ceil(float(len(binarydiff))/8))))
     
-    binaryDiffRSums = []
-    for (offset, v) in enumerate(binarydiff):
-        binaryDiffRSums.append(sum(binarydiff[offset:]))
+    if args['verbose']>1:
+        binaryDiffRSums = []
+        binaryDiffRSumsV2 = []
+        for (offset, v) in enumerate(binarydiff):
+            binaryDiffRSums.append(sum(binarydiff[offset:]))
+            binaryDiffRSumsV2.append(sum(binarydiff[offset+1:]))
             
-    print("        binaryDiffRSums=hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSums))))
+        print("        binaryDiffRSums=   hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSums))))
+        print("        binaryDiffRSumsV2= hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSumsV2))))
     
     
     print("\n    %s" % ("~" * 40))
@@ -132,7 +136,7 @@ if __name__ == '__main__':
     dct = list(set(bytes))
     dct.sort(reverse=True)
     sd = ''.join("%s" % (print_char(x)) for x in dct)
-    if len(sd)<16 or args['verbose']>0:
+    if len(sd)<16 or args['verbose']>2:
         print("    --dictionary='%s'" % (sd))
         print("        %db" % len(sd))
     #print("    --dictionary='%s'" % (''.join("0x%2x" % (x) for x in dct)))

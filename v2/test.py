@@ -393,6 +393,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
     """
         python 3.5:
             20.0s
+            9.7s
     """
     def test_16_15(self):
         """ 
@@ -401,16 +402,32 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_V
             --binarydiff              0110011111010010
               offsets                 0123456789012345
             -> binaryDiffRSums        9987776543221110
+            -> binaryDiffRSumsV2      9877765432211100
                                       .............^..
 
         """
         # the splitpoint analizer fails for this case. It should return something different
-        #self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+        
+        # different split points
         #self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 13,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
-        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 11,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+        #self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 11,ord('a'), (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
      
-    #def test_26_10(self):
-    #    self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
+    """
+        python 3.5:
+            xx.xs
+    """
+    def test_26_10(self):
+        """ 
+            --splitPoint=0x13,0x61 (@19, a)
+                                     'srrrrpnmmiieeeeeaaaa.     '
+            --binarydiff              01000111010100001000110000
+              offsets                 01234567890123456789012345
+            -> binaryDiffRSums        99888876554433333222210000
+            -> binaryDiffRSumsV2      98888765544333332222100000
+                                      ...................^......
+        """
+        self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
     
     #def test_30_10(self):
     #    self.assertEqual(self.getHitCounter()('999888777666555444333222111000'.encode('utf-8'), self.getSolver(30, 1575, (0x39, 0x30), 0x0e,0x35,  (0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,))), 1)

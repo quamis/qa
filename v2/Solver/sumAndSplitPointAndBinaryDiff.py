@@ -218,6 +218,7 @@ class V2(Solver.Base.Base):
         
         self.indexMap = None
         self.binaryDiffRSums = []
+        self.binaryDiffRSumsV2 = []
         
         self.stats['_computeLimits'] = {}
         self.stats['_computeLimits'][0x1] = 0
@@ -247,6 +248,8 @@ class V2(Solver.Base.Base):
     def initialize(self):
         for (offset, v) in enumerate(self.hints['binarydiff']):
             self.binaryDiffRSums.append(sum(self.hints['binarydiff'][offset:]))
+            self.binaryDiffRSumsV2.append(sum(self.hints['binarydiff'][offset+1:]))
+            
         
     def _found_solution(self, tbuf, depth):
         # DEBUGGING
@@ -294,27 +297,17 @@ class V2(Solver.Base.Base):
                 self.hints['value'],
                 self.hints['value']
             )
+            
+        if (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['index']]):
+                #sys.stdout.write("\n     %s, %d, %d" % ('<' if offset<self.hints['index'] else '>', offset, self.hints['index']))
+                #sys.stdout.flush()
+                return (
+                    None,
+                    self.hints['value'],
+                    self.hints['value']
+                )
         
         if self.hints['binarydiff'][offset]==0:
-            #print("-= %s" % (list(self.hints['binarydiff'])))
-            #print("-+ %s" % (self.binaryDiffRSums))
-            #exit()
-            #if offset<self.hints['index'] and (self.binaryDiffRSums[offset-1]==self.binaryDiffRSums[self.hints['index']]):
-            #    sys.stdout.write("\n     <" % ())
-            #    sys.stdout.flush()
-            #    return (
-            #        None,
-            #        self.hints['value'],
-            #        self.hints['value']
-            #    )
-            #if offset>self.hints['index'] and (self.binaryDiffRSums[offset-1]==self.binaryDiffRSums[self.hints['index']]):
-            #    sys.stdout.write("\n     >" % ())
-            #    sys.stdout.flush()
-            #    return (
-            #        None,
-            #        self.hints['value'],
-            #        self.hints['value']
-            #    )
             return (
                 None,
                 cc,
