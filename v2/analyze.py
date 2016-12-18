@@ -10,7 +10,7 @@ args = vars(parser.parse_args())
 
 def print_char(ch):
     #if chr(ch) in string.ascii_letters or chr(ch) in string.digits:
-    if re.match(r"[a-zA-Z0-9 .,!]", chr(ch)) is None:
+    if re.match(r"[a-zA-Z0-9\ \!\@\#\$\%\^\&\*\(\)\_\+\-\=\~\`\[\]\{\}\;\'\:\"\,\.\<\>\/\?]", chr(ch)) is None:
         return ("?")
     else:
         return ("%c" % (ch))
