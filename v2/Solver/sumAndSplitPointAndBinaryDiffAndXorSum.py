@@ -61,11 +61,16 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
     def __init__(self):
         super(V1, self).__init__()
         self.hints['xorsum'] = 0x00
+        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
+        
+    def determineParalelizationPoints(self):
+        complexity = [{}]*self.hints['length']
+        print(complexity)
+        #self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], self.hints['xorsum'])
         
     
     def solve(self, callback=None):
         # temporary data buffer
-        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
         self.callback = callback
         
         if self.hints['sum']==0:
