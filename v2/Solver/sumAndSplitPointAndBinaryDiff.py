@@ -215,6 +215,7 @@ class V2(Solver.Base.Base):
         self.hints['value'] = None
         self.hints['index'] = None
         self.hints['binarydiff'] = ()
+        self.hints['finalValues'] = ()
         
         self.indexMap = None
         self.binaryDiffRSums = []
@@ -253,6 +254,9 @@ class V2(Solver.Base.Base):
             self.binaryDiffRSums.append(sum(self.hints['binarydiff'][offset:]))
             self.binaryDiffRSumsV2.append(sum(self.hints['binarydiff'][offset+1:]))
             
+        if len(self.hints['finalValues'])==0:
+            self.hints['finalValues'] = [None]*self.hints['length']
+            
         
     def _found_solution(self, tbuf):
         self.stats['_found_solution']['calls']+=1
@@ -271,6 +275,13 @@ class V2(Solver.Base.Base):
         
         
     def _computeLimits(self, offset, cc):
+        if not self.hints['finalValues'][offset] is None:
+            return (
+                None,
+                self.hints['finalValues'][offset][0],
+                self.hints['finalValues'][offset][1],
+            );
+    
         if offset==self.hints['index']:
             self.stats['_computeLimits']['o==i']+= 1
             return (

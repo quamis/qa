@@ -64,6 +64,9 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
         super(V1, self).__init__()
         self.hints['xorsum'] = 0x00
         
+        self.stats['_generate_tbuf_fromsum::printIntervalMax'] = 100000
+        self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
+        
     def _determineComplexityRaw(self):
         points = []
         self.initialize()
@@ -103,15 +106,10 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
                 
                 score.append(10.0 * (float((self.hints['length'] - p['offset']))/self.hints['length']))
                 
-            print(score)
             p['_score'] = sum(score)
             points[k] = p
 
         points = sorted(points, key=lambda p: p['_score'], reverse=True)
-        print("-+"*50)
-        for p in points:
-            print("    score: %10.2f, offset: %2d, size: %d" % (p['_score'], p['offset'], p['size']))
-            
         return points
         
         
