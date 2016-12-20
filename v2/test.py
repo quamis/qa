@@ -463,7 +463,7 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_w
     def getSolver(self, len, sum, interval, index, value, xorsum, binarydiff):
         slv = Solver.sumAndSplitPointAndBinaryDiffAndXorSum.V1()
         
-        # min width: 4+4+2+1+1 = 12
+        # min width: 4+4+2+2+1+L/8 = 13+L/8
         slv.setHint('length', len)
         slv.setHint('sum', sum)
         slv.setHint('interval', (max(interval), min(interval)))
@@ -499,13 +499,16 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_w
         # the splitpoint analizer fails for this case. It should return something different
         self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, 0x00, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
         
-    #def test_26_10(self):
-    #    self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, 0x06, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
+    def test_26_10(self):
+        self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, 0x06, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
     
-    #def test_26_11(self):
-        #self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(26, 2479, (0x76,0x20), 0x15,0x4e, 0x39, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))), 1)
+    def test_26_11(self):
+        self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(26, 2479, (0x76,0x20), 0x15,0x4e, 0x39, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))), 1)
     #    self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(26, 2479, (0x76,0x20), 20,ord('a'), 0x39, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))), 1)
     
+    def test_62_10(self):
+        self.assertEqual(self.getHitCounter()('yywuuuttttttssrrrrpoooooonnnnmlllihhecbaaUTTH44310.-)(        '.encode('utf-8'), self.getSolver(62, 5555, (0x79,0x20), 0x20,0x6c, 0x53, (0,0,1,1,0,0,1,0,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,))), 1)
+  
        
        
 """

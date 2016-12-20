@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+
 import Solver.Base
 import Solver.sum
 import Solver.sumAndSplitPoint
@@ -68,6 +70,9 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
         print(complexity)
         #self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], self.hints['xorsum'])
         
+        self.stats['_generate_tbuf_fromsum::printIntervalMax'] = 1000000
+        self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
+        
     
     def solve(self, callback=None):
         # temporary data buffer
@@ -97,6 +102,12 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
             return r-1
         
         cmin-= 1
+
+        self.stats['_generate_tbuf_fromsum::printInterval']-=1
+        if self.stats['_generate_tbuf_fromsum::printInterval']<0:
+            sys.stdout.write("\n ~~~~~ '%s' sum:%d (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf), self.print_buf_as_binarydiff(self.tbuf)))
+            sys.stdout.flush()
+            self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
         
         ret = 0
         while c > cmin:
