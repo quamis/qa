@@ -63,26 +63,67 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
     def __init__(self):
         super(V1, self).__init__()
         self.hints['xorsum'] = 0x00
-        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
+        
+    def _determineComplexityRaw(self):
+        points = []
+        self.initialize()
+        sum = self.hints['sum']
+
+        maxsize = 0
+        for offset in range(0, self.hints['length']):
+            (r, c, cmin) = self._computeLimits(offset, max(min(self.hints['interval'][0], sum), self.hints['interval'][1]))
+            cpl = {
+                'offset': offset,
+                'interval': [c, cmin, ],
+                'size': abs(c - cmin)+1,
+            }
+            
+            maxsize = max(maxsize, cpl['size'])
+            
+            sum-= (c+cmin)//2
+            points.append(cpl)
+            
+        return {
+            'points':       points,
+            'maxsize':      maxsize,
+        }
         
     def determineParalelizationPoints(self):
-        complexity = [{}]*self.hints['length']
-        print(complexity)
-        #self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], self.hints['xorsum'])
+        #points = [{'size':d['size'], 'offset':d['offset'], } for d in self._determineComplexityRaw()]
+        cplRaw = self._determineComplexityRaw()
+        points = cplRaw['points']
+        maxsize = self.hints['interval'][0]-self.hints['interval'][1]
+        for (k, p) in enumerate(points):
+            score = []
+            if p['size']>1:
+                if p['size']>4: # 4 is the number of cores. should be dynamic though:)
+                    score.append(1.0 * (float(p['size']-1)/cplRaw['maxsize']))
+                else:
+                    score.append(10.0 * (float(p['size']-1)/cplRaw['maxsize']))
+                
+                score.append(10.0 * (float((self.hints['length'] - p['offset']))/self.hints['length']))
+                
+            print(score)
+            p['_score'] = sum(score)
+            points[k] = p
+
+        points = sorted(points, key=lambda p: p['_score'], reverse=True)
+        print("-+"*50)
+        for p in points:
+            print("    score: %10.2f, offset: %2d, size: %d" % (p['_score'], p['offset'], p['size']))
+            
+        return points
         
-        self.stats['_generate_tbuf_fromsum::printIntervalMax'] = 1000000
-        self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
         
-    
     def solve(self, callback=None):
         # temporary data buffer
+        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
         self.callback = callback
         
         if self.hints['sum']==0:
             self._found_solution(bytearray([0]*self.hints['length']))
         else:
             #self._generate_tbuf_fromsum(self.hints['sum'] - (self.hints['interval'][1]*self.hints['length']), 0, self.hints['interval'][0])
-            print(self.hints['xorsum'])
             self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], self.hints['xorsum'])
         
         self.callback = None

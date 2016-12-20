@@ -509,7 +509,13 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_w
     def test_62_10(self):
         self.assertEqual(self.getHitCounter()('yywuuuttttttssrrrrpoooooonnnnmlllihhecbaaUTTH44310.-)(        '.encode('utf-8'), self.getSolver(62, 5555, (0x79,0x20), 0x20,0x6c, 0x53, (0,0,1,1,0,0,1,0,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,))), 1)
   
-       
+    def test_62_10_complexity(self):
+        # self.assertEqual(self.getHitCounter()('yywuuuttttttssrrrrpoooooonnnnmlllihhecbaaUTTH44310.-)(        '.encode('utf-8'), 
+        slv = self.getSolver(62, 5555, (0x79,0x20), 0x20,0x6c, 0x53, (0,0,1,1,0,0,1,0,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,))
+        paralelizationPoints = slv.determineParalelizationPoints()
+        #print(paralelizationPoints)
+  
+          
        
 """
 class Solver_sumAndMedian_V1(unittest.TestCase):
