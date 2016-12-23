@@ -113,8 +113,27 @@ class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_w
         
         #self.assertEqual(self.getHitCounter()('vtttssroooniiihfeeddaN    '.encode('utf-8'), self.getSolver(L, 2479, (0x76,0x20), 0x15,0x4e, 0x39, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,), finalValues)), 1)
 
-
-    
+class Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_withXorSum_V1_mt(Tests.Base.Solver_sum_Words_withCallback):
+    def getSolver(self, len, sum, interval, index, value, xorsum, binarydiff):
+        slv = Solver.sumAndSplitPointAndBinaryDiffAndXorSum.V1_mt()
+        
+        # min width: 4+4+2+2+1+L/8 = 13+L/8
+        slv.setHint('length', len)
+        slv.setHint('sum', sum)
+        slv.setHint('interval', (max(interval), min(interval)))
+        slv.setHint('index', index)
+        slv.setHint('value', value)
+        slv.setHint('xorsum', xorsum)
+        slv.setHint('binarydiff', binarydiff)
+        
+        return slv
+        
+    def test_26_11_mt(self):
+        L = 26
+        slv = self.getSolver(L, 2479, (0x76,0x20), 0x15,0x4e, 0x39, (0,1,0,0,1,0,1,1,0,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,0,))
+        countSolverHitsWithCallback('vtttssroooniiihfeeddaN    '.encode('utf-8'), slv)
+       
+        
 """
 class Solver_sumAndMedian_V1(unittest.TestCase):
     def getSolver(self, len, sum, median):

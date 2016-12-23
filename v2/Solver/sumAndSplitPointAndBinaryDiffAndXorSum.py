@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
+import sys, time
 
 import Solver.Base
 import Solver.sum
@@ -174,3 +174,37 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
         
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return ret
+
+        
+class V1_mt(V1):  
+    def __init__(self):
+        super(V1_mt, self).__init__()
+        
+        self.settings = {}
+        self.settings['warmup_time'] = 5
+        self.settings['reportProgress_time'] = 10
+        
+        self.stats['solve::start'] = 0
+        self.stats['_generate_tbuf_fromsum::calls'] = 0
+        self.stats['_generate_tbuf_fromsum::reportingInterval'] = None
+        
+    def solve(self, callback=None):
+        self.stats['solve::start'] = time.time()
+        return super(V1_mt, self).solve(callback)
+        
+    def _report_progress(self, tbuf):
+        print("progress %s" % (self.print_buf_as_str(tbuf)))
+        #return self.callbackProgress(tbuf, {})
+        
+    def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
+        self.stats['_generate_tbuf_fromsum::calls']+= 1
+        
+        if self.stats['_generate_tbuf_fromsum::reportingInterval']:
+            if self.stats['_generate_tbuf_fromsum::calls']>self.stats['_generate_tbuf_fromsum::reportingInterval']:
+                self.stats['_generate_tbuf_fromsum::calls'] = 0
+                self._report_progress(self.tbuf)
+        elif self.stats['_generate_tbuf_fromsum::calls']%100 ==0 and time.time() - self.stats['solve::start']>self.settings['warmup_time']:
+            self.stats['_generate_tbuf_fromsum::reportingInterval'] = (self.stats['_generate_tbuf_fromsum::calls']//self.settings['warmup_time'])*self.settings['reportProgress_time'];
+            print("%d seconds has passed, we looped %d times. Settings callback limits to %d ~= %d seconds" % (self.settings['warmup_time'], self.stats['_generate_tbuf_fromsum::calls'], self.stats['_generate_tbuf_fromsum::reportingInterval'], self.settings['reportProgress_time']))
+            
+        return super(V1_mt, self)._generate_tbuf_fromsum(sum, offset, cc, xorsum)
