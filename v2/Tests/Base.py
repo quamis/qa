@@ -281,6 +281,3 @@ class Solver_sum_Words_withCallback(unittest.TestCase):
     #def test_01_ab(self):
     #    self.assertEqual(self.getCounter()(self.getSolver(2, 1)), 1)
         
-
-    
-    
