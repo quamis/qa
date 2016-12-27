@@ -50,7 +50,7 @@ class SolverTracer(Solver.sumAndSplitPointAndBinaryDiffAndXorSum.V1):
         ret = "\n"
         t = time.time()
         for r in returns:
-            ret+= "    > %02d 0x%02x:0x%02x (%02d) (%s:%s) , age: %.3fs\n" % (r['offset'], r['cmax'], r['cmin'], r['cmax'] - r['cmin'], chr(r['cmax']), chr(r['cmin']), t - r['time'])
+            ret+= "    > %02d 0x%02x:0x%02x (%02d) (%s:%s), age: %.3fs\n" % (r['offset'], r['cmax'], r['cmin'], r['cmax'] - r['cmin'], chr(r['cmax']), chr(r['cmin']), t - r['time'])
         return ret
         
     def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
