@@ -132,8 +132,7 @@ class V1(Solver.Base.Base):
                     (self.hints['interval'][1] + self.binaryDiffRSumsV2[offset])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
                 )
                 
-        
-    def solve(self, callback=None):
+    def solve_rec(self, callback=None):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
         self.callback = callback
@@ -145,8 +144,7 @@ class V1(Solver.Base.Base):
             self._generate_tbuf_fromsum(self.hints['sum'], 0, self.hints['interval'][0], self.hints['xorsum'])
         
         self.callback = None
-    
-    
+        
     def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
         noffset = offset+1
         nsumoffset = (self.hints['length'] - noffset)*self.hints['interval'][1]
@@ -194,3 +192,76 @@ class V1(Solver.Base.Base):
         
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return ret
+
+    
+    def solve(self, callback=None):
+        self.callback = callback
+        self.solve_lin(callback)
+        self.callback = None
+    
+
+    def solve_lin(self, callback=None):
+        # temporary data buffer
+        self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
+        
+        self._stack = []
+        for i in range(self.hints['length']):
+            self._stack.append([])
+        
+        offset = 0
+        
+        (r, cmax, cmin) = self._computeLimits(offset, self.hints['interval'][0])
+        self._stack[offset] = [self.hints['interval'][0], self.hints['sum'], self.hints['xorsum'], cmax, cmin]
+        
+        doContinue = True
+        
+        while True:
+            #print(offset)
+            (c, sum, xorsum, cmax, cmin) = self._stack[offset]
+            
+            nsumoffset = (self.hints['length'] - offset + 1)*self.hints['interval'][1]
+            
+            doContinue = False
+            cmin-= 1
+            while c > cmin:
+                
+                self.tbuf[offset] = c
+                nsum = sum - c
+                nxorsum = xorsum ^ c
+                
+                if offset==(self.hints['length']-2):
+                    if (nsum - nsumoffset)==0:
+                        if nxorsum == self.hints['interval'][1]:
+                            print("~~~~~ '%s' sum:%d" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf)))
+                            r = self._found_solution(self.tbuf)
+                            doContinue = False
+                            break
+                            # break????
+                            
+                    #        if r:
+                    #            ret = r-1
+                    #            break
+                    #    else:
+                    #        #ret = 4
+                    #        break
+                else:                        # noffset<(self.hints['length']-1):, still something to distribuite
+                    # check childs
+                    doContinue = True
+                    self._stack[offset][0] = c-1
+                    offset+=1
+                    (r, ncmax, ncmin) = self._computeLimits(offset, c)
+                    self._stack[offset] = [ncmax, nsum, nxorsum, ncmax, ncmin]
+                    break   # break while c>cmin
+                c-=1
+            # old return?
+            
+            #self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
+            # end of while c>cmin
+            if doContinue==False:
+                # pop the stack
+                offset-=1
+                if offset<0:
+                    break # stop the main loop
+                #(c, sum, xorsum, cmax, cmin) = self._stack[offset]
+            
+            
