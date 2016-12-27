@@ -67,52 +67,6 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
         self.stats['_generate_tbuf_fromsum::printIntervalMax'] = 100000
         self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
         
-    def _determineComplexityRaw(self):
-        points = []
-        self.initialize()
-        sum = self.hints['sum']
-
-        maxsize = 0
-        for offset in range(0, self.hints['length']):
-            (r, c, cmin) = self._computeLimits(offset, max(min(self.hints['interval'][0], sum), self.hints['interval'][1]))
-            cpl = {
-                'offset': offset,
-                'interval': [c, cmin, ],
-                'size': abs(c - cmin)+1,
-            }
-            
-            maxsize = max(maxsize, cpl['size'])
-            
-            sum-= (c+cmin)//2
-            points.append(cpl)
-            
-        return {
-            'points':       points,
-            'maxsize':      maxsize,
-        }
-        
-    def determineParalelizationPoints(self):
-        #points = [{'size':d['size'], 'offset':d['offset'], } for d in self._determineComplexityRaw()]
-        cplRaw = self._determineComplexityRaw()
-        points = cplRaw['points']
-        maxsize = self.hints['interval'][0]-self.hints['interval'][1]
-        for (k, p) in enumerate(points):
-            score = []
-            if p['size']>1:
-                if p['size']>4: # 4 is the number of cores. should be dynamic though:)
-                    score.append(1.0 * (float(p['size']-1)/cplRaw['maxsize']))
-                else:
-                    score.append(10.0 * (float(p['size']-1)/cplRaw['maxsize']))
-                
-                score.append(10.0 * (float((self.hints['length'] - p['offset']))/self.hints['length']))
-                
-            p['_score'] = sum(score)
-            points[k] = p
-
-        points = sorted(points, key=lambda p: p['_score'], reverse=True)
-        return points
-        
-        
     def solve(self, callback=None):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
@@ -174,37 +128,3 @@ class V1(Solver.sumAndSplitPointAndBinaryDiff.V2):
         
         self.tbuf[offset] = self.hints['interval'][1] # not sure this is needed
         return ret
-
-        
-class V1_mt(V1):  
-    def __init__(self):
-        super(V1_mt, self).__init__()
-        
-        self.settings = {}
-        self.settings['warmup_time'] = 5
-        self.settings['reportProgress_time'] = 10
-        
-        self.stats['solve::start'] = 0
-        self.stats['_generate_tbuf_fromsum::calls'] = 0
-        self.stats['_generate_tbuf_fromsum::reportingInterval'] = None
-        
-    def solve(self, callback=None):
-        self.stats['solve::start'] = time.time()
-        return super(V1_mt, self).solve(callback)
-        
-    def _report_progress(self, tbuf):
-        print("progress %s" % (self.print_buf_as_str(tbuf)))
-        #return self.callbackProgress(tbuf, {})
-        
-    def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
-        self.stats['_generate_tbuf_fromsum::calls']+= 1
-        
-        if self.stats['_generate_tbuf_fromsum::reportingInterval']:
-            if self.stats['_generate_tbuf_fromsum::calls']>self.stats['_generate_tbuf_fromsum::reportingInterval']:
-                self.stats['_generate_tbuf_fromsum::calls'] = 0
-                self._report_progress(self.tbuf)
-        elif self.stats['_generate_tbuf_fromsum::calls']%100 ==0 and time.time() - self.stats['solve::start']>self.settings['warmup_time']:
-            self.stats['_generate_tbuf_fromsum::reportingInterval'] = (self.stats['_generate_tbuf_fromsum::calls']//self.settings['warmup_time'])*self.settings['reportProgress_time'];
-            print("%d seconds has passed, we looped %d times. Settings callback limits to %d ~= %d seconds" % (self.settings['warmup_time'], self.stats['_generate_tbuf_fromsum::calls'], self.stats['_generate_tbuf_fromsum::reportingInterval'], self.settings['reportProgress_time']))
-            
-        return super(V1_mt, self)._generate_tbuf_fromsum(sum, offset, cc, xorsum)
