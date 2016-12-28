@@ -45,15 +45,17 @@ class Solver_NRSumAndSplitPointAndBinaryDiffAndXorSum_V1(Tests.Base.Solver_sum_W
     
     """
         python 3.5: 
-            0.710s
+            0.71s
+            0.36s
     """
     def test_16_13(self):
         self.assertEqual(self.getHitCounter()('zyxvutsqomkigeca'.encode('utf-8'), self.getSolver(16, 1774, (0x7a,0x61), 0x08,0x6f, 0x0e, (0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))), 1)
     
     """
         python 3.5: 
-            6.250s
-            5.5s
+            6.25s
+            5.50s
+            3.90s
     """
     def test_16_15(self):
         # the splitpoint analizer fails for this case. It should return something different

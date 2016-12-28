@@ -12,13 +12,11 @@ class V1(Solver.Base.Base):
         self.hints = {}
         
         # internals
-        self.indexMap = None
-        self.binaryDiffRSums = []
-        self.binaryDiffRSumsV2 = []
         self._stack = []
+        self._precalc_binaryDiffRSums = []
+        self._precalc_binaryDiffRSumsV2 = []
         self._precalc_returns = []
-        self._precalc_nsumoffset = []
-        
+        self._precalc__computeLimits = []
         
         self.hints['length'] = None # the length of the output data
         self.hints['sum'] = None    # the sum of the output data
@@ -30,42 +28,17 @@ class V1(Solver.Base.Base):
         self.hints['xorsum'] = 0x00
         self.hints['finalValues'] = ()
         
-        
-        self.stats['_found_solution'] = {}
-        self.stats['_found_solution']['calls'] = 0
-        self.stats['_computeLimits'] = {}
-        self.stats['_computeLimits']['o==i'] = 0
-        self.stats['_computeLimits']['dro==drl'] = 0
-        self.stats['_computeLimits']['dro==i'] = 0
-        self.stats['_computeLimits']['dro==0'] = 0
-        self.stats['_computeLimits']['bdo==0'] = 0
-        self.stats['_computeLimits']['bdo==1, o<i'] = 0
-        self.stats['_computeLimits']['bdo==1, o>=i'] = 0
-        self.stats['_computeLimits']['precalc'] = 0
-        self.stats['_generate_tbuf_fromsum::maxReports'] = 2000
-        self.stats['_generate_tbuf_fromsum::reports'] = self.stats['_generate_tbuf_fromsum::maxReports']
-        
-        self.stats['_generate_tbuf_fromsum::printIntervalMax'] = 100000
-        self.stats['_generate_tbuf_fromsum::printInterval'] = self.stats['_generate_tbuf_fromsum::printIntervalMax']
-        self.stats['solve_lin']={}
-        self.stats['solve_lin']['ret:sum+xor:True'] = 0
-        self.stats['solve_lin']['ret:sum+xor:False'] = 0
-        self.stats['solve_lin']['go:deep'] = 0
-        self.stats['solve_lin']['iter:depth'] = {}
-        
-        
     def initialize(self):
-        for (offset, v) in enumerate(self.hints['binarydiff']):
-            self.binaryDiffRSums.append(sum(self.hints['binarydiff'][offset:]))
-            self.binaryDiffRSumsV2.append(sum(self.hints['binarydiff'][offset+1:]))
-            
         if len(self.hints['finalValues'])==0:
             self.hints['finalValues'] = [None]*self.hints['length']
             
-        for offset in range(self.hints['length']):
-            self.stats['solve_lin']['iter:depth'][offset] = 0
             
-        self._precalc__computeLimits = []
+        for (offset, _) in enumerate(self.hints['binarydiff']):
+            # binaryDiffs
+            self._precalc_binaryDiffRSums.append(sum(self.hints['binarydiff'][offset:]))
+            self._precalc_binaryDiffRSumsV2.append(sum(self.hints['binarydiff'][offset+1:]))
+
+
         for offset in range(self.hints['length']):
             # _stack
             self._stack.append(None)
@@ -84,17 +57,17 @@ class V1(Solver.Base.Base):
                     self.hints['value']
                 )
             if pc is None:
-                if (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['length']-1]):
+                if (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[self.hints['length']-1]):
                     pc = (
                         self.hints['interval'][1],
                         self.hints['interval'][1]
                     )        
-                elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[self.hints['index']]):
+                elif (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[self.hints['index']]):
                     pc = (
                         self.hints['value'],
                         self.hints['value']
                     )
-                elif (self.binaryDiffRSumsV2[offset]==self.binaryDiffRSumsV2[0]):
+                elif (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[0]):
                     pc = (
                         self.hints['interval'][0],
                         self.hints['interval'][0]
@@ -104,17 +77,14 @@ class V1(Solver.Base.Base):
             
             # _precalc_returns
             i = offset
-            #while self.binaryDiffRSumsV2[i]==self.binaryDiffRSumsV2[offset]:
-            while self.binaryDiffRSums[i]==self.binaryDiffRSums[offset]:
+            #while self._precalc_binaryDiffRSumsV2[i]==self._precalc_binaryDiffRSumsV2[offset]:
+            while self._precalc_binaryDiffRSums[i]==self._precalc_binaryDiffRSums[offset]:
                 i-=1
                 
-            self._precalc_returns.append((offset-i) + 1)
+            self._precalc_returns.append((offset-i) + 2)
             
-            # _precalc_nsumoffset
-            self._precalc_nsumoffset.append((self.hints['length'] - offset - 1)*self.hints['interval'][1])
-
-        
-        
+        print(self._precalc__computeLimits)
+            
     def _found_solution(self, tbuf):
         # DEBUGGING
         #sys.stdout.write("\n ##### '%s' sum:%d (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
@@ -142,12 +112,12 @@ class V1(Solver.Base.Base):
                 if offset<self.hints['index']:
                     return (
                         cc - 1,
-                        self.hints['value'] + (self.binaryDiffRSumsV2[offset] - self.binaryDiffRSumsV2[self.hints['index']])
+                        self.hints['value'] + (self._precalc_binaryDiffRSumsV2[offset] - self._precalc_binaryDiffRSumsV2[self.hints['index']])
                     )
                 else:
                     return (
                         cc - 1,
-                        (self.hints['interval'][1] + self.binaryDiffRSumsV2[offset])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
+                        (self.hints['interval'][1] + self._precalc_binaryDiffRSumsV2[offset])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
                     )
 
     def solve(self, callback=None):
@@ -159,7 +129,6 @@ class V1(Solver.Base.Base):
     def solve_lin(self, callback=None):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
-        
         
         offset = 0
         
@@ -184,13 +153,16 @@ class V1(Solver.Base.Base):
                 nsum = sum - c
                 nxorsum = xorsum ^ c
                 
+                #print("%s 0x%02x (%c)" % ("  "*offset, c, c))
+                #print("%s %c" % ("  "*offset, c))
+                
                 if offset==(self.hints['length']-2): # -2 instead of -1 is an optimization, because we already know the last element in the list, we can avoid an extra depth-walk
-                    if (nsum - self._precalc_nsumoffset[offset])==0:
+                    if nsum == self.hints['interval'][1]:
                         if nxorsum == self.hints['interval'][1]:
                             r = self._found_solution(self.tbuf)
-
-                        offset-= self._precalc_returns[offset]
-                        break
+                            offset-= self._precalc_returns[offset]
+                            #offset-= 1
+                            break
                 else:                        # noffset<(self.hints['length']-1):, still something to distribuite
                     # check childs
                     doContinue = True
@@ -216,6 +188,7 @@ class V1(Solver.Base.Base):
                 #print("%d returns %d" % (offset, precalc_ret-1))
                 #offset-= precalc_ret-1 # why isn't this working?
                 offset-= 1
+                
                 if offset<0:
                     break # stop the main loop
             
