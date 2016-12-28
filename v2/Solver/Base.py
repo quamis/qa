@@ -36,8 +36,27 @@ class Base(object):
     def initialize(self):
         pass    
     
+    def print_obj(self, obj, key, depth=0):
+        if key is None:
+            rsort = sorted(obj.items(), key=(operator.itemgetter(0)))
+        else:
+            rsort = sorted(obj[key].items(), key=operator.itemgetter(0))
+        
+        ret = ""
+        if not key is None:
+            ret+=("\n%s%s" % ("    "*depth, key))
+        for (k, v) in rsort:
+            if isinstance(v, int):
+                ret+=("\n%s    %-20s: %10d" % ("    "*depth, k, v))
+            elif isinstance(v, dict):
+                ret+=("\n%s    %-20s: %s" % ("    "*depth, k, self.print_obj(v, None, depth+1)))
+        return ret
+    
     def destroy(self):
         print(self.stats)
+        
+        if 'solve_lin' in self.stats:
+            print(self.print_obj(self.stats, 'solve_lin'))
         
         if '_computeLimits' in self.stats:
             _computeLimits = sorted(self.stats['_computeLimits'].items(), key=operator.itemgetter(0))

@@ -31,6 +31,9 @@ import Solver.sumAndSplitPointAndBinaryDiffAndXorSum
     
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withXorSum_V1.test_16_10_srrrpnmieeeeeaaa
     
+    # most optimal
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_withXorSum_V1.test_16_13
+    
 
 """
 

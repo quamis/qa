@@ -43,13 +43,26 @@ class Solver_NRSumAndSplitPointAndBinaryDiffAndXorSum_V1(Tests.Base.Solver_sum_W
     def test_16_12(self):
         self.assertEqual(self.getHitCounter()('zjihgfeeddccbaaa'.encode('utf-8'), self.getSolver(16, 1631, (0x7a,0x61), 0x08,0x64, 0x13, (0,1,1,1,1,1,1,0,1,0,1,0,1,1,0,0,))), 1)
     
+    """
+        python 3.5: 
+            0.710s
+    """
     def test_16_13(self):
         self.assertEqual(self.getHitCounter()('zyxvutsqomkigeca'.encode('utf-8'), self.getSolver(16, 1774, (0x7a,0x61), 0x08,0x6f, 0x0e, (0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,))), 1)
     
+    """
+        python 3.5: 
+            6.250s
+            5.5s
+    """
     def test_16_15(self):
         # the splitpoint analizer fails for this case. It should return something different
         self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, 0x00, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
-        
+    
+    """
+        python 3.5: 
+            7.111s
+    """
     def test_26_10(self):
         self.assertEqual(self.getHitCounter()('srrrrpnmmiieeeeeaaaa.     '.encode('utf-8'), self.getSolver(26, 2320, (0x73, 0x20), 0x13,0x61, 0x06, (0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,))), 1)
     
