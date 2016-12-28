@@ -18,6 +18,9 @@ class V1(Solver.Base.Base):
         self._precalc_returns = []
         self._precalc__computeLimits = []
         
+        self._precalc__computeLimits_lt = 0
+        self._precalc__computeLimits_gt = 0
+        
         self.hints['length'] = None # the length of the output data
         self.hints['sum'] = None    # the sum of the output data
         self.hints['md5'] = None    # the md5 sum of the output data
@@ -48,29 +51,29 @@ class V1(Solver.Base.Base):
             if pc is None and not self.hints['finalValues'][offset] is None:
                 pc = (
                     self.hints['finalValues'][offset][0],
-                    self.hints['finalValues'][offset][1],
+                    self.hints['finalValues'][offset][1] - 1
                 )
                 
             if pc is None and offset==self.hints['index']:
                 pc = (
                     self.hints['value'],
-                    self.hints['value']
+                    self.hints['value'] - 1
                 )
             if pc is None:
                 if (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[self.hints['length']-1]):
                     pc = (
                         self.hints['interval'][1],
-                        self.hints['interval'][1]
+                        self.hints['interval'][1] - 1
                     )        
                 elif (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[self.hints['index']]):
                     pc = (
                         self.hints['value'],
-                        self.hints['value']
+                        self.hints['value'] - 1
                     )
                 elif (self._precalc_binaryDiffRSumsV2[offset]==self._precalc_binaryDiffRSumsV2[0]):
                     pc = (
                         self.hints['interval'][0],
-                        self.hints['interval'][0]
+                        self.hints['interval'][0] - 1
                     )
                 
             self._precalc__computeLimits.append(pc)
@@ -80,10 +83,19 @@ class V1(Solver.Base.Base):
             #while self._precalc_binaryDiffRSumsV2[i]==self._precalc_binaryDiffRSumsV2[offset]:
             while self._precalc_binaryDiffRSums[i]==self._precalc_binaryDiffRSums[offset]:
                 i-=1
-                
             self._precalc_returns.append((offset-i) + 2)
-            
-        print(self._precalc__computeLimits)
+        
+        
+        self._precalc__computeLimits_lt = self.hints['value'] - self._precalc_binaryDiffRSumsV2[self.hints['index']] - 1
+        self._precalc__computeLimits_gt = self.hints['interval'][1] - 1
+        
+        s = ""
+        for d in self._precalc__computeLimits:
+            if d is None:
+                s+= "None, " 
+            else:
+                s+= "0x%02x-0x%02x, " % (d[0], d[1]+1)
+        print("(%s)" % (s))
             
     def _found_solution(self, tbuf):
         # DEBUGGING
@@ -106,18 +118,18 @@ class V1(Solver.Base.Base):
             if self.hints['binarydiff'][offset]==0:
                 return (
                     cc,
-                    cc
+                    cc - 1
                 )
             elif self.hints['binarydiff'][offset]==1:
                 if offset<self.hints['index']:
                     return (
                         cc - 1,
-                        self.hints['value'] + (self._precalc_binaryDiffRSumsV2[offset] - self._precalc_binaryDiffRSumsV2[self.hints['index']])
+                        self._precalc__computeLimits_lt + self._precalc_binaryDiffRSumsV2[offset]
                     )
                 else:
                     return (
                         cc - 1,
-                        (self.hints['interval'][1] + self._precalc_binaryDiffRSumsV2[offset])    # equivalent to (self.hints['interval'][1] + sum(self.hints['binarydiff'][offset+1:])) 
+                        self._precalc__computeLimits_gt + self._precalc_binaryDiffRSumsV2[offset]
                     )
 
     def solve(self, callback=None):
@@ -138,7 +150,7 @@ class V1(Solver.Base.Base):
             self.hints['sum'], 
             self.hints['xorsum'], 
             cmax, 
-            cmin-1,
+            cmin,
         ]
         
         doContinue = True
@@ -177,7 +189,7 @@ class V1(Solver.Base.Base):
                         nsum, 
                         nxorsum, 
                         ncmax, 
-                        ncmin-1, 
+                        ncmin, 
                     ]
                     break   # break while c>cmin
                 c-=1

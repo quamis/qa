@@ -60,6 +60,15 @@ class Solver_NRSumAndSplitPointAndBinaryDiffAndXorSum_V1(Tests.Base.Solver_sum_W
     def test_16_15(self):
         # the splitpoint analizer fails for this case. It should return something different
         self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x0d,0x61, 0x00, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+
+    def test_16_15_s2(self):
+        # the splitpoint analizer fails for this case. It should return something different
+        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x08,0x69, 0x00, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+    
+    def test_16_15_s3(self):
+        # the splitpoint analizer fails for this case. It should return something different
+        self.assertEqual(self.getHitCounter()('zsrrrpnmieeaaa  '.encode('utf-8'), self.getSolver(16, 1572, (0x7a,0x20), 0x07,0x6d, 0x00, (0,1,1,0,0,1,1,1,1,1,0,1,0,0,1,0,))), 1)
+    
     
     """
         python 3.5: 

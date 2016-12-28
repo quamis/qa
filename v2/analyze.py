@@ -79,13 +79,21 @@ if __name__ == '__main__':
     #for s in spoints:
     #    print("    > %s @%02d   diff:%d score:%.3f" % (print_char(s[3]), s[2], s[1], s[0]))
     
-    spoint = spoints[0]
-    if spoint[2]==0:
-        spoint = spoints[1]
-    if spoint[2]==len(sbytes)-1:
-        spoint = spoints[1]
-        
+    spoffset = 0
+    if spoints[spoffset][2]==0: # avoid interval limits
+        spoffset+=1
+    if spoints[spoffset][2]==len(sbytes)-1: # avoid interval limits
+        spoffset+=1
+
+    spoint = spoints[spoffset]
     print("    --splitPoint=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
+    spoffset+=1
+    spoint = spoints[spoffset]
+    print("    --splitPoint(next pick)=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
+    spoffset+=1
+    spoint = spoints[spoffset]
+    print("    --splitPoint(next pick)=0x%02x,0x%02x (@%d, %s)" % (spoint[2], spoint[3], spoint[2], print_char(spoint[3]), ))
+    
     print("        depends on sum, optimization hint, ordering:False, len:2b")
     print("        like median, but not necessarily in the middle, but at a split point.")
     if args['verbose']>8:
