@@ -19,7 +19,6 @@ class V1(Solver.Base.Base):
         self.hints['xorsum'] = 0x00
         self.hints['finalValues'] = ()
         
-        
         # internals
         self.stats = {}
         self._stack = []
@@ -147,15 +146,11 @@ class V1(Solver.Base.Base):
                 nsum = sum - c
                 nxorsum = xorsum ^ c
                 
-                #print("%s 0x%02x (%c)" % ("  "*offset, c, c))
-                #print("%s %c" % ("  "*offset, c))
-                
                 if offset==(self.hints['length']-2): # -2 instead of -1 is an optimization, because we already know the last element in the list, we can avoid an extra depth-walk
                     if nsum == self.hints['interval'][1]:
                         if nxorsum == self.hints['interval'][1]:
                             callback(self.tbuf, { })
                             offset-= self._precalc_returns[offset]
-                            #offset-= 1
                             break
                 else:                        # noffset<(self.hints['length']-1):, still something to distribuite
                     # check childs
@@ -179,7 +174,6 @@ class V1(Solver.Base.Base):
             
             
             if doContinue==False:   # pop the stack
-                #print("%d returns %d" % (offset, precalc_ret-1))
                 #offset-= precalc_ret-1 # why isn't this working?
                 offset-= 1
                 
