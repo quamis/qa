@@ -16,7 +16,7 @@ import Solver.mtBase
 import multiprocessing
 
 """
-    py ./test-mt.py -v Solver_sum_RecursiveOptimized_withInterval_withSplitPoint_withBinaryDiff_withXorSum_V1.test_26_10
+    py ./test-mt.py -v Solver_mtBase_SolverTracer.test_26_11_mt
 
 """
 def thread(idx, slv):

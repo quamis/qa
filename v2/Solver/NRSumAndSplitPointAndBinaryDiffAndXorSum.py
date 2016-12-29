@@ -19,6 +19,8 @@ class V1(Solver.Base.Base):
         self.hints['xorsum'] = 0x00
         self.hints['finalValues'] = ()
         
+        self.settings = {}
+        
         # internals
         self.stats = {}
         self._stack = []
@@ -33,6 +35,7 @@ class V1(Solver.Base.Base):
         
         
     def initialize(self):
+        # TODO: remove support for finalValues, we can now access the stack dirrectly
         if len(self.hints['finalValues'])==0:
             self.hints['finalValues'] = [None]*self.hints['length']
             

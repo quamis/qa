@@ -1,71 +1,78 @@
 # -*- coding: utf-8 -*-
 import sys, time
 
-import Solver.Base
-import Solver.sum
-import Solver.sumAndSplitPoint
-import Solver.sumAndSplitPointAndBinaryDiff
-import Solver.sumAndSplitPointAndBinaryDiffAndXorSum
-from Solver.Base import CallbackResult
+import Solver.NRSumAndSplitPointAndBinaryDiffAndXorSum
 
-class SolverTracer(Solver.sumAndSplitPointAndBinaryDiffAndXorSum.V1):  
+class SolverTracer(Solver.NRSumAndSplitPointAndBinaryDiffAndXorSum.V1):  
     def __init__(self):
         super(SolverTracer, self).__init__()
         
-        self.settings = {}
-        self.settings['warmup_time'] = 4
-        self.settings['reportProgress_time'] = 2
+        # settings
+        self.settings['warmup_time'] = 2
+        self.settings['reportProgress_time'] = 1
+        
+        self.settings['maxProcesses'] = 4
+        
+        # settings
+        self.stats['processes'] = []
         
         self.stats['solve::start'] = 0
         
         self.stats['_computeLimits::returns'] = []
-        self.stats['_generate_tbuf_fromsum::calls'] = 0
-        self.stats['_generate_tbuf_fromsum::reportingInterval'] = None
+        self.stats['_computeLimits::calls'] = 0
+        self.stats['_computeLimits::reportingInterval'] = None
+        
         
     def solve(self, callback=None):
         self.stats['solve::start'] = time.time()
         
         for i in range(self.hints['length']):
-            self.stats['_computeLimits::returns'].append({
-                'offset': i,
-                'time': self.stats['solve::start'],
-                'cmin': 0x00,
-                'cmax': 0xff,
-            })
+            self.stats['_computeLimits::returns'].append(self.stats['solve::start'])
         
         return super(SolverTracer, self).solve(callback)
+
+    def print_stack(self, stack, coffset=None):
+        ret = ""
+        for (offset, stk) in enumerate(stack):
+            if stk:
+                ret+=("\n    %s %02d: @0x%02x (0x%02x-0x%02x)... sum:%d, xor:0x%02x" % (
+                    (">" if offset==coffset else "~"), 
+                    offset,
+                    stk[0],
+                    stk[3],
+                    stk[4],
+                    stk[1],
+                    stk[2],
+                ))
+        return ret
         
-    def _report_progress(self, tbuf, state):
-        print("progress: %s, %s" % (state, self.print_buf_as_str(tbuf)))
+    def _spawn(self, maxoffset):
+        print(self._precalc__computeLimits)
+        print(self._stack)
+        nstack = self._stack[:]
+        for (offset, stk) in enumerate(self._stack):
+            if offset<maxoffset:
+                if (stk[0]-stk[4])>1:   # c - cmin
+                    nstack[offset][0]-=1
+                    print(" >> %d" % (offset))
+                    print(self.print_stack(nstack, offset))
+                    break
+        exit()
+        return False
         #return self.callbackProgress(tbuf, {})
         
     def _computeLimits(self, offset, cc):
         r = super(SolverTracer, self)._computeLimits(offset, cc)
-        self.stats['_computeLimits::returns'][offset]['time'] = time.time()
-        self.stats['_computeLimits::returns'][offset]['cmin'] = r[2]
-        self.stats['_computeLimits::returns'][offset]['cmax'] = r[1]
+        self.stats['_computeLimits::returns'][offset] = time.time()
+        
+        # handle time slices, to check for new thread space availability
+        self.stats['_computeLimits::calls']+= 1
+        if self.stats['_computeLimits::reportingInterval']:
+            if self.stats['_computeLimits::calls']>self.stats['_computeLimits::reportingInterval']:
+                if self._spawn(offset):
+                    self.stats['_computeLimits::calls'] = 0
+        elif self.stats['_computeLimits::calls']%5000==0 and (time.time() - self.stats['solve::start'])>self.settings['warmup_time']:
+            self.stats['_computeLimits::reportingInterval'] = (self.stats['_computeLimits::calls']//self.settings['warmup_time'])*self.settings['reportProgress_time']
+            #self.stats['_computeLimits::calls'] = 0
+        
         return r
-        
-    def print__computeLimits_returns(self, returns):
-        ret = "\n"
-        t = time.time()
-        for r in returns:
-            ret+= "    > %02d 0x%02x:0x%02x (%02d) (%s:%s), age: %.3fs\n" % (r['offset'], r['cmax'], r['cmin'], r['cmax'] - r['cmin'], chr(r['cmax']), chr(r['cmin']), t - r['time'])
-        return ret
-        
-    def _generate_tbuf_fromsum(self, sum, offset, cc, xorsum):
-        self.stats['_generate_tbuf_fromsum::calls']+= 1
-        
-        if self.stats['_generate_tbuf_fromsum::reportingInterval']:
-            if self.stats['_generate_tbuf_fromsum::calls']>self.stats['_generate_tbuf_fromsum::reportingInterval']:
-                self.stats['_generate_tbuf_fromsum::calls'] = 0
-                self._report_progress(self.tbuf, "interval")
-        elif self.stats['_generate_tbuf_fromsum::calls']%100 ==0 and time.time() - self.stats['solve::start']>self.settings['warmup_time']:
-                self.stats['_generate_tbuf_fromsum::reportingInterval'] = (self.stats['_generate_tbuf_fromsum::calls']//self.settings['warmup_time'])*self.settings['reportProgress_time'];
-                print(self.print__computeLimits_returns(self.stats['_computeLimits::returns']))
-                print("%d seconds has passed, we looped %d times. Settings callback limits to %d ~= %d seconds" % (self.settings['warmup_time'], self.stats['_generate_tbuf_fromsum::calls'], self.stats['_generate_tbuf_fromsum::reportingInterval'], self.settings['reportProgress_time']))
-        elif offset>(self.hints['length']-2):
-            exit()
-            self._report_progress(self.tbuf, "warmup")
-            
-        return super(SolverTracer, self)._generate_tbuf_fromsum(sum, offset, cc, xorsum)
