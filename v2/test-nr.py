@@ -5,7 +5,7 @@ import unittest
 import Tests.Base
 
 import Solver.NRSumAndSplitPointAndBinaryDiffAndXorSum
-
+#import Solver.NRSumAndSplitPointAndBinaryDiffAndXorSumV2 # pyx module
 
 """
     py test-nr.py -v Solver_NRSumAndSplitPointAndBinaryDiffAndXorSum_V1.test_04_10
@@ -14,6 +14,7 @@ import Solver.NRSumAndSplitPointAndBinaryDiffAndXorSum
 class Solver_NRSumAndSplitPointAndBinaryDiffAndXorSum_V1(Tests.Base.Solver_sum_Words_withCallback):
     def getSolver(self, len, sum, interval, index, value, xorsum, binarydiff):
         slv = Solver.NRSumAndSplitPointAndBinaryDiffAndXorSum.V1()
+        #slv = Solver.NRSumAndSplitPointAndBinaryDiffAndXorSumV2.V1()
         
         slv.setHint('length', len)
         slv.setHint('sum', sum)

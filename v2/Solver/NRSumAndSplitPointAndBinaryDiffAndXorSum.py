@@ -3,24 +3,13 @@ import sys, time
 
 import Solver.Base
 from Solver.Base import CallbackResult
+import Cython
+
 
 class V1(Solver.Base.Base):
     def __init__(self):
         # general vars
-        self.callback = None
-        self.stats = {}
         self.hints = {}
-        
-        # internals
-        self._stack = []
-        self._precalc_binaryDiffRSums = []
-        self._precalc_binaryDiffRSumsV2 = []
-        self._precalc_returns = []
-        self._precalc__computeLimits = []
-        
-        self._precalc__computeLimits_lt = 0
-        self._precalc__computeLimits_gt = 0
-        
         self.hints['length'] = None # the length of the output data
         self.hints['sum'] = None    # the sum of the output data
         self.hints['md5'] = None    # the md5 sum of the output data
@@ -30,6 +19,20 @@ class V1(Solver.Base.Base):
         self.hints['binarydiff'] = ()
         self.hints['xorsum'] = 0x00
         self.hints['finalValues'] = ()
+        
+        
+        # internals
+        self.stats = {}
+        self._stack = []
+        self._precalc_binaryDiffRSums = []
+        self._precalc_binaryDiffRSumsV2 = []
+        self._precalc_returns = []
+        self._precalc__computeLimits = []
+        
+        self._precalc__computeLimits_lt = 0
+        self._precalc__computeLimits_gt = 0
+        
+        
         
     def initialize(self):
         if len(self.hints['finalValues'])==0:
@@ -97,20 +100,6 @@ class V1(Solver.Base.Base):
                 s+= "0x%02x-0x%02x, " % (d[0], d[1]+1)
         print("(%s)" % (s))
             
-    def _found_solution(self, tbuf):
-        # DEBUGGING
-        #sys.stdout.write("\n ##### '%s' sum:%d (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_sum(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
-        #sys.stdout.flush()
-        
-        # DEBUGGING
-        #self.stats['_generate_tbuf_fromsum::reports']-=1
-        #if self.stats['_generate_tbuf_fromsum::reports']<0:
-        #    sys.stdout.write("\n %s (%s)" % (self.print_buf_as_str(self.tbuf), self.print_buf_as_binarydiff(tbuf)))
-        #    sys.stdout.flush()
-        #    self.stats['_generate_tbuf_fromsum::reports']=self.stats['_generate_tbuf_fromsum::maxReports']
-            
-        return self.callback(tbuf, { })
-        
     def _computeLimits(self, offset, cc):
         if self._precalc__computeLimits[offset]:
             return self._precalc__computeLimits[offset]
@@ -133,12 +122,6 @@ class V1(Solver.Base.Base):
                     )
 
     def solve(self, callback=None):
-        self.callback = callback
-        self.solve_lin(callback)
-        self.callback = None
-    
-
-    def solve_lin(self, callback=None):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
         
@@ -171,7 +154,7 @@ class V1(Solver.Base.Base):
                 if offset==(self.hints['length']-2): # -2 instead of -1 is an optimization, because we already know the last element in the list, we can avoid an extra depth-walk
                     if nsum == self.hints['interval'][1]:
                         if nxorsum == self.hints['interval'][1]:
-                            r = self._found_solution(self.tbuf)
+                            callback(self.tbuf, { })
                             offset-= self._precalc_returns[offset]
                             #offset-= 1
                             break
