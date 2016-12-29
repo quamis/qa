@@ -122,6 +122,7 @@ class V1(Solver.Base.Base):
                         self._precalc__computeLimits_gt + self._precalc_binaryDiffRSumsV2[offset]
                     )
 
+                    
     def solve(self, callback=None):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
