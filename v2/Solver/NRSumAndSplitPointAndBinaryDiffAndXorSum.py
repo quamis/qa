@@ -3,7 +3,6 @@ import sys, time
 
 import Solver.Base
 from Solver.Base import CallbackResult
-import Cython
 
 
 class V1(Solver.Base.Base):
