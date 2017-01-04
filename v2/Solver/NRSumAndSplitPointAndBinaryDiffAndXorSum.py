@@ -123,11 +123,9 @@ class V1(Solver.Base.Base):
                     )
 
                     
-    def solve(self, callback=None):
+    def solve(self, callback=None, offset=0):
         # temporary data buffer
         self.tbuf = bytearray([self.hints['interval'][1]]*self.hints['length'])
-        
-        offset = 0
         
         (cmax, cmin) = self._computeLimits(offset, self.hints['interval'][0])
         self._stack[0] = [

@@ -13,8 +13,6 @@ import Solver.sumAndSplitPointAndBinaryDiffAndXorSum
 import Solver.mtBase
 #import Solver.sumAndMD5
 
-import multiprocessing
-
 """
     py ./test-mt.py -v Solver_mtBase_SolverTracer.test_26_11_mt
 
@@ -45,9 +43,17 @@ def countSolverHitsWithCallback(match, slv):
     
     global solutions
     solutions = 0
-    slv.initialize()
-    slv.solve(callback=slv_callback)
-    slv.destroy()
+    
+    
+    manager = Solver.mtBase.SolverManager()
+    manager.setSolver(slv)
+    
+    #slv.initialize()
+    #slv.solve(callback=slv_callback)
+    #slv.destroy()
+    manager.initialize()
+    manager.solve(callback=slv_callback)
+    manager.destroy()
     
     if DBG:
         print("    solutions: %d" % (solutions))
