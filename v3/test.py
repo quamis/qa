@@ -23,6 +23,7 @@ class Solver_sum_Recursive(Tests.Base.Solver_sum_Binary):
         return Tests.Base.countSolver
         
     def test_4_10_1111(self):
+        # 0x31313131
         self.assertEqual(self.getCounter()(self.getSolver(4, 0x00, 0x00)), 1)
 
 if __name__ == '__main__':

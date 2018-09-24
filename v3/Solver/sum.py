@@ -21,50 +21,45 @@ class Recursive(Solver.Base.Base):
     def solve(self):
         # temporary data buffer
         tbuf = bytearray([0]*self.hints['length'])
-        for t in self._generate_tbuf_fromsum(tbuf[:], 0):
-            yield t
-    
-    def _generate_tbuf_fromsum(self, tbuf, offset):
-        self.stats['_generate_tbuf_fromsum:calls']+= 1
-        noffset = offset+1
         
-        # print("%08x" % self.stats['_generate_tbuf_fromsum:calls'])
+        altsum = 0
+        sum = 0
+        xor = 0
         
-        if noffset==self.hints['length']:
-            yield tbuf
-            
-        if noffset>self.hints['length']:
-            return 
-            
-        if noffset>self.hints['length']:
-            # depth protection
-            return
-        
-        for c in range(0xff, 0x00, -1):
-            for t in self._generate_tbuf_fromsum(tbuf[:], noffset):
-                tbuf[noffset] = c
-                yield t
-
-        """
-        if altsum==0 and xor==self.hints['xor'] and offset==(self.hints['length']+1):
-            self.stats['_generate_tbuf_fromsum:found']+= 1
-            #self.print_tbuf(tbuf)
-            yield tbuf
-            
-        if offset>=self.hints['length']:
-            self.stats['_generate_tbuf_fromsum:misses:overflow']+= 1
-            return
-        
-        for c in range(cc, 0x00, -1):
-            tbuf[offset] = c
-            self.print_tbuf(tbuf)
-            
-            # propagate found solutions
-            if offset % 2==0:
-                nsum = altsum + c
-            else:
-                nsum = altsum - c
-                
-            for t in self._generate_tbuf_fromsum(tbuf[:], nsum, offset+1, c, xor ^ c):
-                yield t
-        """
+        for c0 in range(0xff, 0x00, -1):
+            tbuf[0] = c0
+            sum+=c0
+            altsum+= c0
+            xor^= c0
+            for c1 in range(c0, 0x00, -1):
+                tbuf[1] = c1
+                sum+=c1
+                altsum-= c1
+                xor^= c1
+                for c2 in range(c1, 0x00, -1):
+                    tbuf[2] = c2
+                    sum+=c2
+                    altsum+= c2
+                    xor^= c2
+                    for c3 in range(c2, 0x00, -1):
+                        tbuf[3] = c3
+                        sum+=c3
+                        altsum-= c3
+                        xor^= c3
+                        
+                        #if altsum==self.hints['altsum'] and xor==self.hints['xor'] and sum==0xc4:
+                        if altsum==self.hints['altsum'] and xor==self.hints['xor']:
+                            yield tbuf
+                        
+                        xor^= c3
+                        altsum+= c3
+                        sum-=c3
+                    xor^= c2
+                    altsum-= c2
+                    sum-=c2
+                xor^= c1
+                altsum+= c1
+                sum-=c1
+            xor^= c0
+            altsum-= c0
+            sum-=c0
