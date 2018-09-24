@@ -21,11 +21,31 @@ class Recursive(Solver.Base.Base):
     def solve(self):
         # temporary data buffer
         tbuf = bytearray([0]*self.hints['length'])
-        for t in self._generate_tbuf_fromsum(tbuf[:], self.hints['altsum'], 0, 0xff, 0x00):
+        for t in self._generate_tbuf_fromsum(tbuf[:], 0):
             yield t
     
-    def _generate_tbuf_fromsum(self, tbuf, altsum, offset, cc, xor):
+    def _generate_tbuf_fromsum(self, tbuf, offset):
         self.stats['_generate_tbuf_fromsum:calls']+= 1
+        noffset = offset+1
+        
+        # print("%08x" % self.stats['_generate_tbuf_fromsum:calls'])
+        
+        if noffset==self.hints['length']:
+            yield tbuf
+            
+        if noffset>self.hints['length']:
+            return 
+            
+        if noffset>self.hints['length']:
+            # depth protection
+            return
+        
+        for c in range(0xff, 0x00, -1):
+            for t in self._generate_tbuf_fromsum(tbuf[:], noffset):
+                tbuf[noffset] = c
+                yield t
+
+        """
         if altsum==0 and xor==self.hints['xor'] and offset==(self.hints['length']+1):
             self.stats['_generate_tbuf_fromsum:found']+= 1
             #self.print_tbuf(tbuf)
@@ -47,4 +67,4 @@ class Recursive(Solver.Base.Base):
                 
             for t in self._generate_tbuf_fromsum(tbuf[:], nsum, offset+1, c, xor ^ c):
                 yield t
-
+        """

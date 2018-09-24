@@ -13,7 +13,7 @@ from Solver.Base import CallbackResult
     py ./test.py -v Solver_sum_V1_3.test_6_s_623
 """
 
-DBG=True
+DBG=False
 
 def countSolver(slv):
     if DBG:
