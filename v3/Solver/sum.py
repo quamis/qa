@@ -48,7 +48,7 @@ class Recursive(Solver.Base.Base):
                         xor^= c3
                         
                         #if altsum==self.hints['altsum'] and xor==self.hints['xor'] and sum==0xc4:
-                        if altsum==self.hints['altsum'] and xor==self.hints['xor']:
+                        if (altsum & 0x0f )==self.hints['altsum'] and (xor & 0x0f)==self.hints['xor']:
                             yield tbuf
                         
                         xor^= c3

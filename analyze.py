@@ -107,6 +107,24 @@ if __name__ == '__main__':
     print("    --xorsum=0x%02x" % (lxor))
     print("        speed:10, ordering:False, len:1b")
     
+    lxor = 0x00
+    idx=0
+    for ch in bytes:
+        lxor = ((lxor << 1) & 0xff) ^ ch 
+        idx+=1
+        
+    print("    --xorsum shifted 1=0x%02x" % (lxor))
+    print("        speed:10, ordering:False, len:1b")
+    
+    lxor = 0x00
+    idx=0
+    for ch in bytes:
+        lxor = ((lxor >> 1) & 0xff) ^ ch 
+        idx+=1
+        
+    print("    --xorsum shifted 2=0x%02x" % (lxor))
+    print("        speed:10, ordering:False, len:1b")
+    
     binarydiff = []
     lch = sbytes[0]
     for ch in sbytes:
