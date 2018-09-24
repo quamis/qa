@@ -14,8 +14,9 @@ import Solver.sumAndSplitPointAndBinaryDiffAndXorSum
 
 
 """
-    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_06_10_rrnmeeeaaa
-    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_16_10_srrrpnmieeeeeaaa
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_02_10_ba
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_04_11_zeba
+    py ./test.py -v Solver_sum_RecursiveOptimized_withInterval.test_08_10_zeba
     
     py ./test.py -v Solver_sum_RecursiveOptimized_withInterval_withMedian_V1.test_06_10_rrnmeeeaaa
     
@@ -101,7 +102,14 @@ class Solver_sum_RecursiveOptimized_withInterval(Tests.Base.Solver_sum_Words_wit
         
     def test_06_10_zscbaa(self):
         self.assertEqual(self.getHitCounter()('zscbaa'.encode('utf-8'), self.getSolver(6, 628, (0x7a, 0x61))), 1)
-        
+    
+    """
+    def test_08_10_12345678(self):
+        self.assertEqual(self.getHitCounter()('12345678'.encode('utf-8'), self.getSolver(6, 628, (0x7a, 0x61))), 1)
+            
+    def test_08_11_az190AZ_(self):
+        self.assertEqual(self.getHitCounter()('az190AZ_'.encode('utf-8'), self.getSolver(6, 628, (0x7a, 0x61))), 1)
+    """
         
     """
         python 3.5:

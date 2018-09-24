@@ -1,0 +1,27 @@
+hashers:
+	- bit-encoded variation (1: elm[i]>elm[i-1], 0: elm[i]<=elm[i-1]
+	- sum: fast, allows optimizations, can be 1-4 bytes?
+	- xor
+	- crc32
+
+hash of 4 bytes
+	return max 2 bytes
+		1: sum
+		2: xor
+		
+hash of 8 bytes
+	return max 4 bytes
+		1: sum
+		2: xor
+		3: bit-encoded variation
+		4: 
+		
+		
+hash of 16 bytes
+	return max 8 bytes
+		1: 	sum
+		2: 	char min
+		3: 	char max
+		4,5:bit-encoded variation
+		6:	xor
+		7,8:crc32
