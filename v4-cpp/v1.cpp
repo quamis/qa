@@ -47,15 +47,29 @@ int main()
     unsigned char tbuf[BUFFER_SIZE];
 	int c[BUFFER_SIZE];
 	
-	/* // 12345678
-	unsigned char hint_rawsum=0xb8;
-	unsigned char hint_altsum=0x58;
+	/*
+	// 12345678
+	unsigned char hint_rawsum=0xa4;
+	unsigned char hint_altsum=0x84;
 	unsigned char hint_xorsum=0x08;
-	unsigned char hint_xorsumshifted1=0x1a;
-	unsigned char hint_xorsumshifted2=0x12;
-	unsigned char hint_interval_max=0x72;
-	unsigned char hint_interval_min=0x20;
+	unsigned char hint_xorsumshifted1=0x06;
+	unsigned char hint_xorsumshifted2=0x2a;
+	unsigned char hint_interval_max=0x38;
+	unsigned char hint_interval_min=0x31;
+	unsigned char hint_binarycomparison=0b01111111;
 	*/
+	
+	
+	// 12343210
+	unsigned char hint_rawsum=0x90;
+	unsigned char hint_altsum=0x00;
+	unsigned char hint_xorsum=0x04;
+	unsigned char hint_xorsumshifted1=0x22;
+	unsigned char hint_xorsumshifted2=0x20;
+	unsigned char hint_interval_max=0x34;
+	unsigned char hint_interval_min=0x30;
+	unsigned char hint_binarycomparison=0b00000111;
+	
 	
 	/*
 	// ane0
@@ -69,7 +83,9 @@ int main()
 	unsigned char hint_binarycomparison=0b0001;
 	*/
 	
+	
 	// 12343212
+	/*
 	unsigned char hint_rawsum=0x92;
 	unsigned char hint_altsum=0x82;
 	unsigned char hint_xorsum=0x06;
@@ -78,6 +94,8 @@ int main()
 	unsigned char hint_interval_max=0x34;
 	unsigned char hint_interval_min=0x31;
 	unsigned char hint_binarycomparison=0b01000111;
+	*/
+	
 	
 	
 	int altsum = 0;
@@ -86,6 +104,7 @@ int main()
 	int xorsumshifted1 = 0;
 	int xorsumshifted2 = 0;
 		
+	int next_char_is_smaller_than_cur_char;
 	
 	#define _start_loop(index, from, to) 												\
 		for (c[index]=from; c[index]>=to; c[index]--) {									\
@@ -109,14 +128,31 @@ int main()
 	// ((lxor2 << idx) & 0xff) ^ ch 
 	
 	_start_loop(0, hint_interval_max, hint_interval_min);
-	_start_loop(1, hint_interval_max, hint_interval_min);
-	_start_loop(2, hint_interval_max, hint_interval_min);
-	_start_loop(3, hint_interval_max, hint_interval_min);
-	_start_loop(4, hint_interval_max, hint_interval_min);
-	_start_loop(5, hint_interval_max, hint_interval_min);
-	_start_loop(6, hint_interval_max, hint_interval_min);
-	_start_loop(7, hint_interval_max, hint_interval_min);
-
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(1-1));
+	//printf("\n%d", next_char_is_smaller_than_cur_char);
+	_start_loop(1, (next_char_is_smaller_than_cur_char?tbuf[1-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[1-1]-1));	// TODO: why is +/-1 needed here in the interval limits? the loop uses inclusive checks, the current values should be ok
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(2-1));
+	//printf("\n  %d", next_char_is_smaller_than_cur_char);
+	_start_loop(2, (next_char_is_smaller_than_cur_char?tbuf[2-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[2-1]-1));
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(3-1));
+	//printf("\n    %d", next_char_is_smaller_than_cur_char);
+	_start_loop(3, (next_char_is_smaller_than_cur_char?tbuf[3-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[3-1]-1));
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(4-1));
+	//printf("\n      %d", next_char_is_smaller_than_cur_char);
+	_start_loop(4, (next_char_is_smaller_than_cur_char?tbuf[4-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[4-1]-1));
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(5-1));
+	_start_loop(5, (next_char_is_smaller_than_cur_char?tbuf[5-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[5-1]-1));
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(6-1));
+	_start_loop(6, (next_char_is_smaller_than_cur_char?tbuf[6-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[6-1]-1));
+	
+	next_char_is_smaller_than_cur_char = 0==(hint_binarycomparison & 1<<(7-1));
+	_start_loop(7, (next_char_is_smaller_than_cur_char?tbuf[7-1]+1:hint_interval_max), (next_char_is_smaller_than_cur_char?hint_interval_min:tbuf[7-1]-1));
 
 	bool has_max = false;
 	bool has_min = false;
