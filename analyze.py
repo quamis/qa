@@ -56,6 +56,18 @@ if __name__ == '__main__':
     print("    --sum=0x%08x (%d)" % (sum(bytes), sum(bytes)))
     print("        speed:10, ordering:False, len:4b")
     
+    altsum = 0
+    index = 0
+    for i in bytes:
+        if index%2==0:
+            altsum+=i
+        else:
+            altsum-=i
+        index+=1
+        
+    print("    --altsum=0x%08x (%d)" % (altsum, altsum))
+    print("        speed:9, ordering:False, len:4b")
+    
     print("    --median=0x%02x (0x%02x->0x%02x)" % (sbytes[len(sbytes)//2], sbytes[0], sbytes[len(sbytes)-1]))
     print("        depends on sum, optimization hint, ordering:False, len:1b")
     
@@ -113,7 +125,7 @@ if __name__ == '__main__':
         lxor = ((lxor << 1) & 0xff) ^ ch 
         idx+=1
         
-    print("    --xorsum shifted 1=0x%02x" % (lxor))
+    print("    --xorsum shifted 1, <<=0x%02x" % (lxor))
     print("        speed:10, ordering:False, len:1b")
     
     lxor = 0x00
@@ -122,7 +134,7 @@ if __name__ == '__main__':
         lxor = ((lxor >> 1) & 0xff) ^ ch 
         idx+=1
         
-    print("    --xorsum shifted 2=0x%02x" % (lxor))
+    print("    --xorsum shifted 1, >>=0x%02x" % (lxor))
     print("        speed:10, ordering:False, len:1b")
     
     binarydiff = []
@@ -144,6 +156,17 @@ if __name__ == '__main__':
         print("        binaryDiffRSums=   hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSums))))
         print("        binaryDiffRSumsV2= hex:'%s'" % ( ''.join( colored("%01x" % (bd), 'blue' if i%2==0 else 'red', 'on_white' if i%2==0 else 'on_yellow') for (i, bd) in enumerate(binaryDiffRSumsV2))))
     
+    
+    
+    binarycomparison = []
+    rbytes = bytes[::-1]
+    lch = rbytes[0]
+    for ch in rbytes:
+        binarycomparison.append(0 if lch<=ch else 1)
+        lch = ch
+    print("    --binarycomparison=%s" % ((''.join("%d" % (x) for x in binarycomparison))))
+    print("        (%s)" % (''.join("%s," % (x) for x in binarycomparison)))
+    print("        %dbits ~ %db" % (len(binarycomparison), int(math.ceil(float(len(binarycomparison))/8))))
     
     print("\n    %s" % ("~" * 40))
     print("    --crc32=0x%06x" % (zlib.crc32(bytes) & 0xffffffff))
