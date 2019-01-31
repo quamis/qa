@@ -13,3 +13,5 @@ next optimizations:
 	
 	
 @see https://en.wikipedia.org/wiki/List_of_hash_functions
+
+reverse a crc32 https://www.cosc.canterbury.ac.nz/greg.ewing/essays/CRC-Reverse-Engineering.html
