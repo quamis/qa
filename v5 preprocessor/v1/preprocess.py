@@ -1,4 +1,4 @@
-import sys, zlib, hashlib
+import sys, zlib, hashlib, itertools
 
 # @see https://gist.github.com/cincodenada/6557582
 # @see https://www.falatic.com/index.php/108/python-and-bitwise-rotation
@@ -236,7 +236,262 @@ def unpreprocess_009(data):
     return data
 
 
-data = bytearray(open('img1.jpg', 'rb').read(2048)) 
+def preprocess_010(data):
+    b1 = 0
+    b2 = 0
+    b3 = 0
+    b4 = 0
+    b5 = 0
+    b6 = 0
+    b7 = 0
+    b8 = 0
+    d1 = bytearray([])
+    d2 = bytearray([])
+    d3 = bytearray([])
+    d4 = bytearray([])
+    d5 = bytearray([])
+    d6 = bytearray([])
+    d7 = bytearray([])
+    d8 = bytearray([])
+    for i in range(0, len(data)):
+        b = (data[i] & 0b10000000) >> 7
+        b1+= b
+        d1.append(b)
+
+        b = (data[i] & 0b01000000) >> 6
+        b2+= b
+        d2.append(b)
+
+        b = (data[i] & 0b00100000) >> 5
+        b3+= b
+        d3.append(b)
+
+        b = (data[i] & 0b00010000) >> 4
+        b4+= b
+        d4.append(b)
+
+        b = (data[i] & 0b00001000) >> 3
+        b5+= b
+        d5.append(b)
+
+        b = (data[i] & 0b00000100) >> 2
+        b6+= b
+        d6.append(b)
+
+        b = (data[i] & 0b00000010) >> 1
+        b7+= b
+        d7.append(b)
+
+        b = (data[i] & 0b00000001) >> 0
+        b8+= b
+        d8.append(b)
+
+    print(len(data), b1, b2, b3, b4, b5, b6, b7, b8)
+    ndata = bytearray([])
+    ndata.extend(len(data).to_bytes(length=2, byteorder='big'))
+    ndata.extend(b1.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b2.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b3.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b4.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b5.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b6.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b7.to_bytes(length=2, byteorder='big'))
+    ndata.extend(b8.to_bytes(length=2, byteorder='big'))
+
+    print(d1)
+    d1h = hashlib.md5(d1).digest()
+    d2h = hashlib.md5(d2).digest()
+    d3h = hashlib.md5(d3).digest()
+    d4h = hashlib.md5(d4).digest()
+    d5h = hashlib.md5(d5).digest()
+    d6h = hashlib.md5(d6).digest()
+    d7h = hashlib.md5(d7).digest()
+    d8h = hashlib.md5(d8).digest()
+
+    ndata.extend(d1h)
+    ndata.extend(d2h)
+    ndata.extend(d3h)
+    ndata.extend(d4h)
+    ndata.extend(d5h)
+    ndata.extend(d6h)
+    ndata.extend(d7h)
+    ndata.extend(d8h)
+
+    return ndata
+
+def unpreprocess_010(data):
+    dlen = int.from_bytes(data[0:2], byteorder='big')
+    b1 = int.from_bytes(data[2:4], byteorder='big')
+    b2 = int.from_bytes(data[4:6], byteorder='big')
+    b3 = int.from_bytes(data[6:8], byteorder='big')
+    b4 = int.from_bytes(data[8:10], byteorder='big')
+    b5 = int.from_bytes(data[10:12], byteorder='big')
+    b6 = int.from_bytes(data[12:14], byteorder='big')
+    b7 = int.from_bytes(data[14:16], byteorder='big')
+    b8 = int.from_bytes(data[16:18], byteorder='big')
+
+    d1h = data[18+16*0:18+16*1]
+    d2h = data[18+16*1:18+16*2]
+    d3h = data[18+16*2:18+16*3]
+    d4h = data[18+16*3:18+16*4]
+    d5h = data[18+16*4:18+16*5]
+    d6h = data[18+16*5:18+16*6]
+    d7h = data[18+16*6:18+16*7]
+    d8h = data[18+16*7:18+16*8]
+
+    data1 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b1,
+        'hash': d1h,
+    })
+    data2 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b2,
+        'hash': d2h,
+    })
+    data3 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b3,
+        'hash': d3h,
+    })
+    data4 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b4,
+        'hash': d4h,
+    })
+    data5 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b5,
+        'hash': d5h,
+    })
+    data6 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b6,
+        'hash': d6h,
+    })
+    data7 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b7,
+        'hash': d7h,
+    })
+    data8 = loop_call_010(bytearray([0] * dlen), {
+        'dlen': dlen,
+        'bits': b8,
+        'hash': d8h,
+    })
+
+    print(data1)
+    print(data2)
+    print(data3)
+    print(data4)
+    print(data5)
+    print(data6)
+    print(data7)
+    print(data8)
+
+    data = bytearray([])
+    for i in range(0, dlen):
+        data.append((data1[i] << 7 ) | (data2[i] << 6 ) | (data3[i] << 5 ) | (data4[i] << 4 ) | (data5[i] << 3 ) | (data6[i] << 2 ) | (data7[i] << 1 ) | (data8[i] << 0 ))
+
+    return data
+
+def iter_call_010(data, hints):
+    # for some reason, itertool, just returns the same permutation...
+    for i in range(0, hints['bits']):
+        data[i] = 1
+
+    print("")
+    print("%s %d bits" % ("-"*20, hints['bits']))
+    i = 0
+    comb = itertools.permutations(data)
+    for d in comb:
+        i+=1
+        print_010_data(d)
+        hash = hashlib.md5(bytearray(d)).digest()
+        if hash==hints['hash']:
+            return d
+
+def loop_call_010(data, hints):
+    print("")
+    print("%s %d bits" % ("-"*20, hints['bits']))
+    for i in range(0, hints['bits']):
+        data[i] = 1
+
+    print_010_data(data)
+
+    hash = hashlib.md5(data).digest()
+    if hash==hints['hash']:
+        return data
+
+    return loop_call_010_rec(data, hints, 0, hints['bits'])
+    
+
+def loop_call_010_rec(data, hints, pluss, plusd):
+    for s in range(hints['bits']-1, pluss, -1):
+        if data[s]==1:
+            data[s] = 0
+            for d in range(plusd, hints['dlen']):
+                if data[d]==0:
+                    data[d] = 1
+                    print_010_data(data)
+                    hash = hashlib.md5(data).digest()
+                    if hash==hints['hash']:
+                        return data
+                    
+                    r = loop_call_010_rec(data, hints, s, d)
+                    if not r is None:
+                        return r
+
+                    data[d] = 0
+            data[s] = 1
+
+def rec_call_010(data, hints, i=0):
+    if i==0:
+        print("")
+        print("%s %d bits" % ("-"*20, hints['bits']))
+        
+    
+    if hints['bits']>0:
+        if (hints['dlen'] - i) < hints['bits']:
+            return None
+
+        data[i] = 1
+        hints['bits'] -= 1
+        if hints['bits']==0:
+            print_010_data(data)
+            hash = hashlib.md5(data).digest()
+            if hash==hints['hash']:
+                return data
+            #return None
+
+        if (i+1)<hints['dlen']:
+            r = rec_call_010(data, hints, i+1)
+            if not r is None:
+                return r
+        hints['bits'] += 1
+        data[i] = 0
+
+    data[i] = 0
+    if hints['bits']==0:
+        print_010_data(data)
+        hash = hashlib.md5(data).digest()
+        if hash==hints['hash']:
+            return data
+        return None
+
+    if (i+1)<hints['dlen']:
+        r = rec_call_010(data, hints, i+1)
+        if not r is None:
+            return r
+
+def print_010_data(data):
+    s = ""
+    for i in range(0, len(data)):
+        s+= ("%s" % ('.' if data[i]==0 else '*'))
+    print("\r %s" % (s), end="", flush=False)
+
+
+data = bytearray(open('img1.jpg', 'rb').read(128)) 
 
 sys.setrecursionlimit(3000)
 
@@ -246,4 +501,4 @@ print('Original data:     % 9d, %s'  % (len(data), od.hexdigest()))
 
 test_algo(data, preprocess_none, unpreprocess_none)
 
-test_algo(data, preprocess_009, unpreprocess_009)
+test_algo(data, preprocess_010, unpreprocess_010)
