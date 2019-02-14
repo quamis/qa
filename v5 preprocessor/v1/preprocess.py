@@ -31,6 +31,20 @@ def test_algo(data, preprocessfcn, unpreprocessfcn):
     md.update(uncompressed_data)
     print('Uncompressed data: % 9d, %s' % (len(uncompressed_data), md.hexdigest()))
 
+    
+def test_algo_nocompress(data, preprocessfcn, unpreprocessfcn):
+    print('%s %s' % ('-'*20, (preprocessfcn)))
+
+    compressed_data = preprocessfcn(data[:])
+    mc = hashlib.sha256()
+    mc.update(compressed_data)
+    print('Compressed data:   % 9d, %s' % (len(compressed_data), mc.hexdigest()))
+
+    uncompressed_data = unpreprocessfcn(compressed_data)
+    md = hashlib.sha256()
+    md.update(uncompressed_data)
+    print('Uncompressed data: % 9d, %s' % (len(uncompressed_data), md.hexdigest()))
+
 
 def preprocess_none(data):
     return data
@@ -236,7 +250,7 @@ def unpreprocess_009(data):
     return data
 
 
-def preprocess_010(data):
+def preprocess_011(data):
     b1 = 0
     b2 = 0
     b3 = 0
@@ -298,28 +312,36 @@ def preprocess_010(data):
     ndata.extend(b7.to_bytes(length=2, byteorder='big'))
     ndata.extend(b8.to_bytes(length=2, byteorder='big'))
 
-    print(d1)
-    d1h = hashlib.md5(d1).digest()
-    d2h = hashlib.md5(d2).digest()
-    d3h = hashlib.md5(d3).digest()
-    d4h = hashlib.md5(d4).digest()
-    d5h = hashlib.md5(d5).digest()
-    d6h = hashlib.md5(d6).digest()
-    d7h = hashlib.md5(d7).digest()
-    d8h = hashlib.md5(d8).digest()
+    d1h = zlib.crc32(d1)
+    d2h = zlib.crc32(d2)
+    d3h = zlib.crc32(d3)
+    d4h = zlib.crc32(d4)
+    d5h = zlib.crc32(d5)
+    d6h = zlib.crc32(d6)
+    d7h = zlib.crc32(d7)
+    d8h = zlib.crc32(d8)
 
-    ndata.extend(d1h)
-    ndata.extend(d2h)
-    ndata.extend(d3h)
-    ndata.extend(d4h)
-    ndata.extend(d5h)
-    ndata.extend(d6h)
-    ndata.extend(d7h)
-    ndata.extend(d8h)
+    ndata.extend(d1h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d2h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d3h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d4h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d5h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d6h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d7h.to_bytes(length=4, byteorder='big'))
+    ndata.extend(d8h.to_bytes(length=4, byteorder='big'))
+    
+    print_010_data(d1); print("");
+    print_010_data(d2); print("");
+    print_010_data(d3); print("");
+    print_010_data(d4); print("");
+    print_010_data(d5); print("");
+    print_010_data(d6); print("");
+    print_010_data(d7); print("");
+    print_010_data(d8); print("");
 
     return ndata
 
-def unpreprocess_010(data):
+def unpreprocess_011(data):
     dlen = int.from_bytes(data[0:2], byteorder='big')
     b1 = int.from_bytes(data[2:4], byteorder='big')
     b2 = int.from_bytes(data[4:6], byteorder='big')
@@ -330,64 +352,55 @@ def unpreprocess_010(data):
     b7 = int.from_bytes(data[14:16], byteorder='big')
     b8 = int.from_bytes(data[16:18], byteorder='big')
 
-    d1h = data[18+16*0:18+16*1]
-    d2h = data[18+16*1:18+16*2]
-    d3h = data[18+16*2:18+16*3]
-    d4h = data[18+16*3:18+16*4]
-    d5h = data[18+16*4:18+16*5]
-    d6h = data[18+16*5:18+16*6]
-    d7h = data[18+16*6:18+16*7]
-    d8h = data[18+16*7:18+16*8]
+    d1h = int.from_bytes(data[18+4*0:18+4*1], byteorder='big')
+    d2h = int.from_bytes(data[18+4*1:18+4*2], byteorder='big')
+    d3h = int.from_bytes(data[18+4*2:18+4*3], byteorder='big')
+    d4h = int.from_bytes(data[18+4*3:18+4*4], byteorder='big')
+    d5h = int.from_bytes(data[18+4*4:18+4*5], byteorder='big')
+    d6h = int.from_bytes(data[18+4*5:18+4*6], byteorder='big')
+    d7h = int.from_bytes(data[18+4*6:18+4*7], byteorder='big')
+    d8h = int.from_bytes(data[18+4*7:18+4*8], byteorder='big')
 
-    data1 = loop_call_010(bytearray([0] * dlen), {
+    data1 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b1,
         'hash': d1h,
     })
-    data2 = loop_call_010(bytearray([0] * dlen), {
+    data2 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b2,
         'hash': d2h,
     })
-    data3 = loop_call_010(bytearray([0] * dlen), {
+    data3 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b3,
         'hash': d3h,
     })
-    data4 = loop_call_010(bytearray([0] * dlen), {
+    data4 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b4,
         'hash': d4h,
     })
-    data5 = loop_call_010(bytearray([0] * dlen), {
+    data5 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b5,
         'hash': d5h,
     })
-    data6 = loop_call_010(bytearray([0] * dlen), {
+    data6 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b6,
         'hash': d6h,
     })
-    data7 = loop_call_010(bytearray([0] * dlen), {
+    data7 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b7,
         'hash': d7h,
     })
-    data8 = loop_call_010(bytearray([0] * dlen), {
+    data8 = loop_call_011(bytearray([0] * dlen), {
         'dlen': dlen,
         'bits': b8,
         'hash': d8h,
     })
-
-    print(data1)
-    print(data2)
-    print(data3)
-    print(data4)
-    print(data5)
-    print(data6)
-    print(data7)
-    print(data8)
 
     data = bytearray([])
     for i in range(0, dlen):
@@ -395,23 +408,7 @@ def unpreprocess_010(data):
 
     return data
 
-def iter_call_010(data, hints):
-    # for some reason, itertool, just returns the same permutation...
-    for i in range(0, hints['bits']):
-        data[i] = 1
-
-    print("")
-    print("%s %d bits" % ("-"*20, hints['bits']))
-    i = 0
-    comb = itertools.permutations(data)
-    for d in comb:
-        i+=1
-        print_010_data(d)
-        hash = hashlib.md5(bytearray(d)).digest()
-        if hash==hints['hash']:
-            return d
-
-def loop_call_010(data, hints):
+def loop_call_011(data, hints):
     print("")
     print("%s %d bits" % ("-"*20, hints['bits']))
     for i in range(0, hints['bits']):
@@ -419,33 +416,40 @@ def loop_call_010(data, hints):
 
     print_010_data(data)
 
-    hash = hashlib.md5(data).digest()
+    hash = zlib.crc32(data)
     if hash==hints['hash']:
         return data
 
-    return loop_call_010_rec(data, hints, 0, hints['bits'])
+    return loop_call_011_rec(data, hints, 0, hints['bits'])
     
 
-def loop_call_010_rec(data, hints, pluss, plusd):
+def loop_call_011_rec(data, hints, pluss, plusd):
     for s in range(hints['bits']-1, pluss, -1):
         if data[s]==1:
             data[s] = 0
             for d in range(plusd, hints['dlen']):
                 if data[d]==0:
                     data[d] = 1
-                    print_010_data(data)
-                    hash = hashlib.md5(data).digest()
+                    if s%3==0 and d%10==0:
+                        print_010_data(data)
+                    hash = zlib.crc32(data)
                     if hash==hints['hash']:
                         return data
                     
-                    r = loop_call_010_rec(data, hints, s, d)
+                    r = loop_call_011_rec(data, hints, s, d+1)
                     if not r is None:
                         return r
 
                     data[d] = 0
+                    
+                if data[d]==1:  # optimization
+                    return None
             data[s] = 1
+            
+        if data[s]==0:  # optimization
+            return None
 
-def rec_call_010(data, hints, i=0):
+def rec_call_011(data, hints, i=0):
     if i==0:
         print("")
         print("%s %d bits" % ("-"*20, hints['bits']))
@@ -459,13 +463,13 @@ def rec_call_010(data, hints, i=0):
         hints['bits'] -= 1
         if hints['bits']==0:
             print_010_data(data)
-            hash = hashlib.md5(data).digest()
+            hash = zlib.crc32(data)
             if hash==hints['hash']:
                 return data
             #return None
 
         if (i+1)<hints['dlen']:
-            r = rec_call_010(data, hints, i+1)
+            r = rec_call_011(data, hints, i+1)
             if not r is None:
                 return r
         hints['bits'] += 1
@@ -474,13 +478,13 @@ def rec_call_010(data, hints, i=0):
     data[i] = 0
     if hints['bits']==0:
         print_010_data(data)
-        hash = hashlib.md5(data).digest()
+        hash = zlib.crc32(data)
         if hash==hints['hash']:
             return data
         return None
 
     if (i+1)<hints['dlen']:
-        r = rec_call_010(data, hints, i+1)
+        r = rec_call_011(data, hints, i+1)
         if not r is None:
             return r
 
@@ -499,6 +503,8 @@ od = hashlib.sha256()
 od.update(data)
 print('Original data:     % 9d, %s'  % (len(data), od.hexdigest()))
 
-test_algo(data, preprocess_none, unpreprocess_none)
+#test_algo(data, preprocess_none, unpreprocess_none)
+#test_algo(data, preprocess_010, unpreprocess_010)
 
-test_algo(data, preprocess_010, unpreprocess_010)
+test_algo_nocompress(data, preprocess_none, unpreprocess_none)
+test_algo_nocompress(data, preprocess_011, unpreprocess_011)
