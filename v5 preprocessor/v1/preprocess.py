@@ -749,7 +749,7 @@ def print_010_data(data):
     print("\r %s" % (s), end="", flush=False)
 
 
-data = bytearray(open('img1.jpg', 'rb').read(128)) 
+data = bytearray(open('img1.jpg', 'rb').read(32)) 
 
 sys.setrecursionlimit(3000)
 
