@@ -74,42 +74,42 @@ def preprocess_012(data):
     for i in range(0, len(data)):
         b = (data[i] & 0b10000000) >> 7
         b1+= b
-        rs1+= i*b
+        rs1+= (len(data) - i)*b
         d1.append(b)
 
         b = (data[i] & 0b01000000) >> 6
         b2+= b
-        rs2+= i*b
+        rs2+= (len(data) - i)*b
         d2.append(b)
 
         b = (data[i] & 0b00100000) >> 5
         b3+= b
-        rs3+= i*b
+        rs3+= (len(data) - i)*b
         d3.append(b)
 
         b = (data[i] & 0b00010000) >> 4
         b4+= b
-        rs4+= i*b
+        rs4+= (len(data) - i)*b
         d4.append(b)
 
         b = (data[i] & 0b00001000) >> 3
         b5+= b
-        rs5+= i*b
+        rs5+= (len(data) - i)*b
         d5.append(b)
 
         b = (data[i] & 0b00000100) >> 2
         b6+= b
-        rs6+= i*b
+        rs6+= (len(data) - i)*b
         d6.append(b)
 
         b = (data[i] & 0b00000010) >> 1
         b7+= b
-        rs7+= i*b
+        rs7+= (len(data) - i)*b
         d7.append(b)
 
         b = (data[i] & 0b00000001) >> 0
         b8+= b
-        rs8+= i*b
+        rs8+= (len(data) - i)*b
         d8.append(b)
 
     print("Input length: %d" % (len(data)))
@@ -262,10 +262,11 @@ def loop_call_012(data, hints):
         data[i] = 1
 
     print_bool_data(data)
+    print(" rsum: 0x%04x" %(hints['rsum']), end="")
     
     rsum = 0
     for i in range(0, hints['dlen']):
-        rsum+= i*data[i] 
+        rsum+= (hints['dlen']-i)*data[i] 
     
     
 
@@ -277,45 +278,66 @@ def loop_call_012(data, hints):
     
 
 def loop_call_012_rec(data, rsum, hints, pluss, plusd):
-    for s in range(hints['bits']-1, pluss, -1):
+    for s in range(hints['bits']-1, pluss-1, -1):
         if data[s]==1:
+            if (rsum + s) < hints['rsum']:
+                break
+                
+
             data[s] = 0
-            rsum-= s
+            rsum-= (hints['dlen'] - s)
+                
             for d in range(plusd, hints['dlen']):
                 if data[d]==0:
+                    if (rsum + d)<hints['rsum']:
+                        break
+                        
+                    if (rsum + d)>(hints['rsum'] + hints['rsum']//2):   # not sure if this optimizes correctly, seems pretty random to use //2
+                        break
+                        
                     data[d] = 1
-                    rsum+= d
-                    #if s==(hints['bits']-1) and rsum>hints['rsum']:
-                    #    return None
-        
+                    rsum+= (hints['dlen'] - d)
+                    
                     if (s+d)%20==0:
                         print_bool_data(data)
+                        print(" rsum: 0x%04x, 0x%04x" %(rsum, hints['rsum']), end="")
 
-                    if rsum==hints['rsum']:
+                    if rsum==hints['rsum'] or True:
                         #print_bool_data(data)
                         #return data
                         hash = zlib.crc32(data)
                         if hash==hints['hash']:
                             print_bool_data(data)
+                            print(" rsum: 0x%04x, 0x%04x" %(rsum, hints['rsum']), end="")
                             return data
                     
-                    r = loop_call_012_rec(data, rsum, hints, s, d+1)
+                    r = loop_call_012_rec(data, rsum, hints, s-1, d+1)
                     if not r is None:
                         return r
 
                     data[d] = 0
-                    rsum-= d
+                    rsum-= (hints['dlen'] - d)
                     
                 if data[d]==1:  # optimization
                     return None
             data[s] = 1
-            rsum+= s
+            rsum+= (hints['dlen'] - s)
             
         if data[s]==0:  # optimization
             return None
             
             
-data = bytearray(open('img1.jpg', 'rb').read(32)) 
+#data = bytearray(open('img1.jpg', 'rb').read(128))
+#                    1     2     3     4     5     6     7     8     9     0     1     2     3     4     5     6     7     8     9     0     1     2     3     4     5     6     7     8     9     0     1    2
+#data = bytearray([0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ])
+data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, ])# semi-worst-case?
+#data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, ])
+#data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, ])    # semi-worst-case?
+#data = bytearray([0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ])
+#data = bytearray([0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, ])
+#data = bytearray([0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, ])
+#data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, ])
+#data = bytearray([0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, ])
 
 sys.setrecursionlimit(3000)
 
