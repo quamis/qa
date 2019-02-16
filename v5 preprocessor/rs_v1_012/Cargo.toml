@@ -1,0 +1,10 @@
+[package]
+name = "rs_v1_012"
+version = "0.1.0"
+authors = ["Lucian Sirbu <quamis@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+time = "0.1.12"
+regex = "0.1.41"
+crc = "^1.0.0"
