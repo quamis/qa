@@ -7,6 +7,9 @@ fn main() {
     println!("compressed to {} bytes: {:x?}", data_compressed.len(), data_compressed);
 
     let data_uncompressed = unpreprocess(data_compressed);
+
+    println!("uncompressed to {} bytes: {:x?}", data_uncompressed.len(), data_uncompressed);
+
 }
 
 fn preprocess(data: Vec<u8>)  -> Vec<u8> {
@@ -71,9 +74,7 @@ fn unpreprocess(data_compressed: Vec<u8>) -> Vec<u8> {
 
     let mut reader = Cursor::new(data_compressed);
 
-    let mut dlen: u32 = 0;
-    dlen = reader.read_u16::<BigEndian>().unwrap() as u32;
-
+    let dlen: u32 = reader.read_u16::<BigEndian>().unwrap() as u32;
     for bp in 0..8 {
         bit_sum[bp] = reader.read_u16::<BigEndian>().unwrap() as u32;
     }
@@ -88,20 +89,113 @@ fn unpreprocess(data_compressed: Vec<u8>) -> Vec<u8> {
 
     // re-compose the bit masks
     for bp in 0..8 {
-        bit_list[bp] = loop_call(vec![0;dlen as usize], dlen, bit_sum[bp], running_sum[bp], bit_list_crc32[bp]);
+        println!("uncompressing lane {}", bp);
+        bit_list[bp] = vec![0 as u8; dlen as usize];
+        let uncompressed = loop_call(&mut bit_list[bp], dlen, bit_sum[bp], running_sum[bp], bit_list_crc32[bp]);
+        println!("uncompressed {:?} to {} bytes: {:x?}", uncompressed, bit_list[bp].len(), bit_list[bp]);
+        println!("");
+        if bp>1 {
+            break;
+        }
     }
+
+    // TODO: re-compose data_uncompressed from bit_list
 
     return data_uncompressed;
 }
 
-fn loop_call(mut data_uncompressed: Vec<u8>, hint_dlen: u32, hint_bit_sum: u32, hint_running_sum: u32, hint_crc32: u32) -> Vec<u8> {
-    print!("{}", hint_bit_sum);
+fn loop_call(mut data_uncompressed: &mut Vec<u8>, 
+                hint_dlen: u32, 
+                hint_bit_sum: u32, 
+                hint_rsum: u32, 
+                hint_crc32: u32) -> bool {
+    
     for i in 0..hint_bit_sum {
         data_uncompressed[i as usize] = 1;        
     }
 
-    println!("{:x?}", data_uncompressed);
-    println!("rsum: {:x?}", hint_running_sum);
+    println!("hint_bit_sum: {}, data_uncompressed: {:x?}, rsum: {:x?}", hint_bit_sum, data_uncompressed, hint_rsum);
 
-    return data_uncompressed;
+    let mut rsum = 0;
+    for i in 0..hint_bit_sum {
+        rsum+= (hint_dlen - i) * data_uncompressed[i as usize] as u32;
+    }
+
+    use crc::{crc32};
+    let hash = crc32::checksum_ieee(&data_uncompressed);
+    if hash == hint_crc32 {
+        println!("found direct match: {:x?}", data_uncompressed);
+        return true;
+    }
+
+    println!("    test: {:x?}", data_uncompressed);
+    return loop_call_rec(&mut data_uncompressed, hint_dlen, hint_bit_sum, hint_rsum, hint_crc32, hint_rsum, 0, hint_bit_sum);
+}
+
+fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>, 
+                    hint_dlen: u32, 
+                    hint_bit_sum: u32, 
+                    hint_rsum: u32, 
+                    hint_crc32: u32, 
+                    mut rsum: u32, 
+                    pluss: u32,
+                    plusd: u32) -> bool {
+
+    for s in ((pluss)..(hint_bit_sum)).rev() {
+        if data_uncompressed[s as usize]==1 {
+            //if (rsum + s) < hint_rsum {
+            //    break;
+            //}
+
+            data_uncompressed[s as usize] = 0;
+            //rsum-= hint_dlen - s;
+
+            for d in plusd..hint_dlen {
+                if data_uncompressed[d as usize]==0 {
+                    //if (rsum + d) < hint_rsum {
+                    //    break;
+                    //}
+
+                    //if (rsum + d) > (hint_rsum + hint_rsum/2) {
+                    //    break;
+                    //}
+
+                    data_uncompressed[d as usize] = 1;
+                    //rsum+= hint_dlen - d;
+
+                    // print progress here
+                    println!("    test: {:x?}", data_uncompressed);
+
+                    //if rsum==hint_rsum || true { // TODO: de ce cu "or true"?
+                        use crc::{crc32};
+                        let hash = crc32::checksum_ieee(&data_uncompressed);
+                        if hash == hint_crc32 {
+                            return true;
+                        }
+                    //}
+
+                    let uncompressed = loop_call_rec(&mut data_uncompressed, hint_dlen, hint_bit_sum, hint_rsum, hint_crc32, rsum, pluss+1, d+1);
+                    if uncompressed == true {
+                        return uncompressed;
+                    }
+
+                    data_uncompressed[d as usize] = 0;
+                    //rsum-= hint_dlen - d;
+                }
+
+                if data_uncompressed[d as usize]==1 {
+                    return false;
+                }
+            }
+
+            data_uncompressed[s as usize] = 1;
+            //rsum+= hint_dlen - s
+        }
+
+        if data_uncompressed[s as usize]==0 {
+            return false;
+        }
+    }
+
+    return false;
 }

@@ -298,6 +298,7 @@ def loop_call_012_rec(data, rsum, hints, pluss, plusd):
                     data[d] = 1
                     rsum+= (hints['dlen'] - d)
                     
+                    # print progress here
                     if (s+d)%20==0:
                         print_bool_data(data)
                         print(" rsum: 0x%04x, 0x%04x" %(rsum, hints['rsum']), end="")
