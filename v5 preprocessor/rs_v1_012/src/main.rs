@@ -1,7 +1,8 @@
 fn main() {
     // CRC-32-IEEE being the most commonly used one
     // assert_eq!(crc32::checksum_ieee(b"123456789"), 0xcbf43926);
-    let data = vec!(0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, );
+    // let data = vec!(0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, );
+    let data = vec!(0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, );
 
     let data_compressed = preprocess(data);
     println!("compressed to {} bytes: {:x?}", data_compressed.len(), data_compressed);
@@ -93,6 +94,16 @@ fn unpreprocess(data_compressed: Vec<u8>) -> Vec<u8> {
         bit_list[bp] = vec![0 as u8; dlen as usize];
         let uncompressed = loop_call(&mut bit_list[bp], dlen, bit_sum[bp], running_sum[bp], bit_list_crc32[bp]);
         println!("uncompressed {:?} to {} bytes: {:x?}", uncompressed, bit_list[bp].len(), bit_list[bp]);
+
+        unsafe {
+            println!("    LOOP_CALL_REC_DBG_CALLS: {}", LOOP_CALL_REC_DBG_CALLS);
+            println!("    LOOP_CALL_REC_DBG_HASHCALCULATIONS: {}", LOOP_CALL_REC_DBG_HASHCALCULATIONS);
+            println!("    LOOP_CALL_REC_DBG_SHORTCIRCUIT_1: {}", LOOP_CALL_REC_DBG_SHORTCIRCUIT_1);
+            println!("    LOOP_CALL_REC_DBG_SHORTCIRCUIT_2: {}", LOOP_CALL_REC_DBG_SHORTCIRCUIT_2);
+            println!("    LOOP_CALL_REC_DBG_SHORTCIRCUIT_3: {}", LOOP_CALL_REC_DBG_SHORTCIRCUIT_3);
+            println!("    LOOP_CALL_REC_DBG_SHORTCIRCUIT_4: {}", LOOP_CALL_REC_DBG_SHORTCIRCUIT_4);
+        }
+
         println!("");
         if bp>1 {
             break;
@@ -129,8 +140,15 @@ fn loop_call(mut data_uncompressed: &mut Vec<u8>,
     }
 
     println!("    test: {:x?}", data_uncompressed);
-    return loop_call_rec(&mut data_uncompressed, hint_dlen, hint_bit_sum, hint_rsum, hint_crc32, hint_rsum, 0, hint_bit_sum);
+    return loop_call_rec(&mut data_uncompressed, hint_dlen, hint_bit_sum, hint_rsum, hint_crc32, rsum, 0, hint_bit_sum);
 }
+
+static mut LOOP_CALL_REC_DBG_CALLS: u64 = 0;
+static mut LOOP_CALL_REC_DBG_HASHCALCULATIONS: u64 = 0;
+static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_1: u64 = 0;
+static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_2: u64 = 0;
+static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_3: u64 = 0;
+static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_4: u64 = 0;
 
 fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>, 
                     hint_dlen: u32, 
@@ -140,39 +158,51 @@ fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>,
                     mut rsum: u32, 
                     pluss: u32,
                     plusd: u32) -> bool {
+    unsafe {
+        LOOP_CALL_REC_DBG_CALLS+=1;
+    }
 
     for s in ((pluss)..(hint_bit_sum)).rev() {
         if data_uncompressed[s as usize]==1 {
-            //if (rsum + s) < hint_rsum {
-            //    break;
-            //}
+            if rsum < (hint_dlen - s) {
+                unsafe {
+                    LOOP_CALL_REC_DBG_SHORTCIRCUIT_3+=1;
+                }
+                break;
+            }
 
             data_uncompressed[s as usize] = 0;
-            //rsum-= hint_dlen - s;
+            rsum-= hint_dlen - s;
 
             for d in plusd..hint_dlen {
                 if data_uncompressed[d as usize]==0 {
-                    //if (rsum + d) < hint_rsum {
-                    //    break;
-                    //}
+                    if rsum < (hint_dlen - d) {
+                        unsafe {
+                            LOOP_CALL_REC_DBG_SHORTCIRCUIT_4+=1;
+                        }
+                        break;
+                    }
 
                     //if (rsum + d) > (hint_rsum + hint_rsum/2) {
                     //    break;
                     //}
 
                     data_uncompressed[d as usize] = 1;
-                    //rsum+= hint_dlen - d;
+                    rsum+= hint_dlen - d;
 
                     // print progress here
-                    println!("    test: {:x?}", data_uncompressed);
+                    println!("\r    test: {:x?}", data_uncompressed);
 
-                    //if rsum==hint_rsum || true { // TODO: de ce cu "or true"?
+                    if rsum==hint_rsum { // TODO: de ce cu "or true"?
                         use crc::{crc32};
                         let hash = crc32::checksum_ieee(&data_uncompressed);
+                        unsafe {
+                            LOOP_CALL_REC_DBG_HASHCALCULATIONS+=1;
+                        }
                         if hash == hint_crc32 {
                             return true;
                         }
-                    //}
+                    }
 
                     let uncompressed = loop_call_rec(&mut data_uncompressed, hint_dlen, hint_bit_sum, hint_rsum, hint_crc32, rsum, pluss+1, d+1);
                     if uncompressed == true {
@@ -180,20 +210,26 @@ fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>,
                     }
 
                     data_uncompressed[d as usize] = 0;
-                    //rsum-= hint_dlen - d;
+                    rsum-= hint_dlen - d;
                 }
 
                 if data_uncompressed[d as usize]==1 {
-                    return false;
+                    unsafe {
+                        LOOP_CALL_REC_DBG_SHORTCIRCUIT_2+=1;
+                    }
+                    break;
                 }
             }
 
             data_uncompressed[s as usize] = 1;
-            //rsum+= hint_dlen - s
+            rsum+= hint_dlen - s;
         }
 
         if data_uncompressed[s as usize]==0 {
-            return false;
+            unsafe {
+                LOOP_CALL_REC_DBG_SHORTCIRCUIT_1+=1;
+            }
+            break;
         }
     }
 
