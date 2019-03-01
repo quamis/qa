@@ -74,42 +74,42 @@ def preprocess_012(data):
     for i in range(0, len(data)):
         b = (data[i] & 0b10000000) >> 7
         b1+= b
-        rs1+= (len(data) - i)*b
+        rs1+= (i)*b
         d1.append(b)
 
         b = (data[i] & 0b01000000) >> 6
         b2+= b
-        rs2+= (len(data) - i)*b
+        rs2+= (i)*b
         d2.append(b)
 
         b = (data[i] & 0b00100000) >> 5
         b3+= b
-        rs3+= (len(data) - i)*b
+        rs3+= (i)*b
         d3.append(b)
 
         b = (data[i] & 0b00010000) >> 4
         b4+= b
-        rs4+= (len(data) - i)*b
+        rs4+= (i)*b
         d4.append(b)
 
         b = (data[i] & 0b00001000) >> 3
         b5+= b
-        rs5+= (len(data) - i)*b
+        rs5+= (i)*b
         d5.append(b)
 
         b = (data[i] & 0b00000100) >> 2
         b6+= b
-        rs6+= (len(data) - i)*b
+        rs6+= (i)*b
         d6.append(b)
 
         b = (data[i] & 0b00000010) >> 1
         b7+= b
-        rs7+= (len(data) - i)*b
+        rs7+= (i)*b
         d7.append(b)
 
         b = (data[i] & 0b00000001) >> 0
         b8+= b
-        rs8+= (len(data) - i)*b
+        rs8+= (i)*b
         d8.append(b)
 
     print("Input length: %d" % (len(data)))
@@ -200,12 +200,91 @@ def unpreprocess_100(data):
 
     data1 = loop_call_100(bytearray([0] * b1), 0, {
         'depth': 0,
+        'start': 0, 
+        'end': dlen,
         'dlen': dlen,
         'bits': b1,
         'rsum': rs1,
         'hash': d1h,
     })
-    exit()
+
+    data2 = loop_call_100(bytearray([0] * b2), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b2,
+        'rsum': rs2,
+        'hash': d2h,
+    })
+
+    data3 = loop_call_100(bytearray([0] * b3), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b3,
+        'rsum': rs3,
+        'hash': d3h,
+    })
+
+    data4 = loop_call_100(bytearray([0] * b4), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b4,
+        'rsum': rs4,
+        'hash': d4h,
+    })
+
+    data5 = loop_call_100(bytearray([0] * b5), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b5,
+        'rsum': rs5,
+        'hash': d5h,
+    })
+
+    data6 = loop_call_100(bytearray([0] * b6), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b6,
+        'rsum': rs6,
+        'hash': d6h,
+    })
+
+    data7 = loop_call_100(bytearray([0] * b7), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b7,
+        'rsum': rs7,
+        'hash': d7h,
+    })
+
+    print("%s" % ({
+        'depth': 0,
+        'dlen': dlen,
+        'bits': b8,
+        'rsum': rs8,
+        'hash': d8h,
+    }))
+    data8 = loop_call_100(bytearray([0] * b8), 0, {
+        'depth': 0,
+        'start': 0, 
+        'end': dlen,
+        'dlen': dlen,
+        'bits': b8,
+        'rsum': rs8,
+        'hash': d8h,
+    })
+
 
     print("")
     
@@ -216,46 +295,55 @@ def unpreprocess_100(data):
     return data
 
 def loop_call_100(dataoffsets, rsum, hints):
-    print("")
-    print("%s %d bits" % ("-"*20, hints['bits']))
-    
-    rsum = 0
-    for i in range(hints['depth'], hints['dlen']):
+    if hints['bits']==0:
+        data = bytearray([0] * hints['dlen'])
+        hash = zlib.crc32(data)
+        if hash==hints['hash']:
+            return data
+
+    return rec_call_100(dataoffsets, rsum, hints)
+
+def rec_call_100(dataoffsets, rsum, hints):
+    for i in range(hints['start'], hints['end']):
         rsum+= i
+        if rsum>hints['rsum']:
+            return None
+
         dataoffsets[hints['depth']] = i
         
-        if hints['depth']<len(dataoffsets):
-            loop_call_100(dataoffsets, rsum, {
-                'depth': hints['depth']+1,
-                'dlen': dlen,
-                'bits': b1,
-                'rsum': rs1,
-                'hash': d1h,
+        if (hints['depth']+1)<hints['bits']:
+            r = rec_call_100(dataoffsets, rsum, {
+                'depth': hints['depth'] + 1,
+                #'start': hints['depth']+1, 
+                'start': i + 1, 
+                'end': hints['dlen'],
+                'dlen': hints['dlen'],
+                'bits': hints['bits'],
+                'rsum': hints['rsum'],
+                'hash': hints['hash'],
             })
+            if not r is None:
+                return r
             
         else:
-            data = bytearray([0] * hints['dlen'])
-            for i in dataoffsets:
-                data[i] = 1
+            if rsum==hints['rsum']:
+                data = bytearray([0] * hints['dlen'])
+                for i in dataoffsets:
+                    data[i] = 1
+                    
+                print_bool_data(data);  print("    %s    " % (rsum), end="", flush=False);
                 
-            print_bool_data(data); 
-            
-            hash = zlib.crc32(data)
-            if hash==hints['hash']:
-                return data
+                hash = zlib.crc32(data)
+                if hash==hints['hash']:
+                    return data
                 
         rsum-= i
             
 
-    """
-    hash = zlib.crc32(data)
-    if hash==hints['hash']:
-        return data
-    """
-    return loop_call_100_rec(data, rsum, hints, 0, hints['bits'])
+    return None
     
             
-#data = bytearray(open('img1.jpg', 'rb').read(96))
+#data = bytearray(open('img1.jpg', 'rb').read(32))
 #                    1     2     3     4     5     6     7     8     9     0     1     2     3     4     5     6     7     8     9     0     1     2     3     4     5     6     7     8     9     0     1    2
 #data = bytearray([0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ])
 #data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, ])# semi-worst-case?
@@ -265,7 +353,10 @@ def loop_call_100(dataoffsets, rsum, hints):
 #data = bytearray([0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, ])
 #data = bytearray([0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, ])
 #data = bytearray([0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, ])
-data = bytearray([0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, ])
+#data = bytearray([0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, ])
+#data = bytearray([0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, ])
+#data = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, ])
+data = bytearray([0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, ])
 
 sys.setrecursionlimit(3000)
 
