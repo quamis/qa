@@ -41,7 +41,32 @@ def test_algo_nocompress(data, preprocessfcn, unpreprocessfcn):
     print("")
     return uncompressed_data
 
+def crc16(data: bytes):
+    '''
+    CRC-16-CCITT Algorithm
+    '''
+    
+    poly=0x8408
+    
+    data = bytearray(data)
+    crc = 0xFFFF
+    for b in data:
+        cur_byte = 0xFF & b
+        for _ in range(0, 8):
+            if (crc & 0x0001) ^ (cur_byte & 0x0001):
+                crc = (crc >> 1) ^ poly
+            else:
+                crc >>= 1
+            cur_byte >>= 1
+    crc = (~crc & 0xFFFF)
+    crc = (crc << 8) | ((crc >> 8) & 0xFF)
+    
+    return crc & 0xFFFF
 
+def crc32(data: bytes):
+    return zlib.crc32(data)
+    #return crc16(data)
+    
 def print_bool_data(data):
     s = ""
     for i in range(0, len(data)):
@@ -144,14 +169,14 @@ def preprocess_012(data):
     ndata.extend(rs7.to_bytes(length=2, byteorder='big'))
     ndata.extend(rs8.to_bytes(length=2, byteorder='big'))
 
-    d1h = zlib.crc32(d1)
-    d2h = zlib.crc32(d2)
-    d3h = zlib.crc32(d3)
-    d4h = zlib.crc32(d4)
-    d5h = zlib.crc32(d5)
-    d6h = zlib.crc32(d6)
-    d7h = zlib.crc32(d7)
-    d8h = zlib.crc32(d8)
+    d1h = crc32(d1)
+    d2h = crc32(d2)
+    d3h = crc32(d3)
+    d4h = crc32(d4)
+    d5h = crc32(d5)
+    d6h = crc32(d6)
+    d7h = crc32(d7)
+    d8h = crc32(d8)
 
     ndata.extend(d1h.to_bytes(length=4, byteorder='big'))
     ndata.extend(d2h.to_bytes(length=4, byteorder='big'))
@@ -305,7 +330,7 @@ def unpreprocess_100(data):
 def loop_call_100(dataoffsets, rsum, hints):
     if hints['bits']==0:
         data = bytearray([0] * hints['dlen'])
-        hash = zlib.crc32(data)
+        hash = crc32(data)
         if hash==hints['hash']:
             return data
 
@@ -352,7 +377,7 @@ def rec_call_100(dataoffsets, rsum, hints):
 
                 print_bool_data(data);  print("    %s    " % (rsum), end="", flush=False);
                 
-                hash = zlib.crc32(data)
+                hash = crc32(data)
                 if hash==hints['hash']:
                     return data
                 
@@ -466,7 +491,7 @@ def loop_call_012(data, hints):
     
     
 
-    hash = zlib.crc32(data)
+    hash = crc32(data)
     if hash==hints['hash']:
         return data
 
@@ -501,7 +526,7 @@ def loop_call_012_rec(data, rsum, hints, pluss, plusd):
                     if rsum==hints['rsum'] or True:
                         #print_bool_data(data)
                         #return data
-                        hash = zlib.crc32(data)
+                        hash = crc32(data)
                         if hash==hints['hash']:
                             print_bool_data(data)
                             print(" rsum: 0x%04x, 0x%04x" %(rsum, hints['rsum']), end="")
