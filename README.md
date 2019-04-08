@@ -15,3 +15,6 @@ next optimizations:
 @see https://en.wikipedia.org/wiki/List_of_hash_functions
 
 reverse a crc32 https://www.cosc.canterbury.ac.nz/greg.ewing/essays/CRC-Reverse-Engineering.html
+
+optimize rust, ideeas:
+ - https://www.google.com/url?q=https%3A%2F%2Fwww.cberner.com%2F2019%2F03%2F30%2Fraptorq-rfc6330-rust-optimization%2F&sa=D&usd=2&usg=AFQjCNEn41IgzXIkyIAkbJM2PCEMMrtGVg
