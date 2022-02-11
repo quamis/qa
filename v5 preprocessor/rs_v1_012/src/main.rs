@@ -27,7 +27,7 @@ fn preprocess(data: Vec<u8>)  -> Vec<u8> {
             if b!=0 {
                 running_sum[bp]+= (data.len() - c.0) as u32;
             }
-            
+
             bit_list[bp].push(b);
         }
     }
@@ -57,19 +57,19 @@ fn preprocess(data: Vec<u8>)  -> Vec<u8> {
         // data_compressed.push(crc32::checksum_ieee(&bit_list[bp]));
         data_compressed.write_u32::<BigEndian>(crc32::checksum_ieee(&bit_list[bp])).unwrap();
     }
-    
+
 
     return data_compressed;
 }
 
 
 fn unpreprocess(data_compressed: Vec<u8>) -> Vec<u8> {
-    let mut data_uncompressed: Vec<u8> = vec![];
+    let data_uncompressed: Vec<u8> = vec![];
     let mut bit_sum: Vec<u32> = vec![0;8];
     let mut running_sum: Vec<u32> = vec![0;8];
     let mut bit_list_crc32: Vec<u32> = vec![0;8];
     let mut bit_list = vec![Vec::<u8>::new();8];
-    
+
     use byteorder::{BigEndian, ReadBytesExt};
     use std::io::Cursor;
 
@@ -115,14 +115,14 @@ fn unpreprocess(data_compressed: Vec<u8>) -> Vec<u8> {
     return data_uncompressed;
 }
 
-fn loop_call(mut data_uncompressed: &mut Vec<u8>, 
-                hint_dlen: u32, 
-                hint_bit_sum: u32, 
-                hint_rsum: u32, 
+fn loop_call(mut data_uncompressed: &mut Vec<u8>,
+                hint_dlen: u32,
+                hint_bit_sum: u32,
+                hint_rsum: u32,
                 hint_crc32: u32) -> bool {
-    
+
     for i in 0..hint_bit_sum {
-        data_uncompressed[i as usize] = 1;        
+        data_uncompressed[i as usize] = 1;
     }
 
     println!("hint_bit_sum: {}, data_uncompressed: {:x?}, rsum: {:x?}", hint_bit_sum, data_uncompressed, hint_rsum);
@@ -150,12 +150,12 @@ static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_2: u64 = 0;
 static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_3: u64 = 0;
 static mut LOOP_CALL_REC_DBG_SHORTCIRCUIT_4: u64 = 0;
 
-fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>, 
-                    hint_dlen: u32, 
-                    hint_bit_sum: u32, 
-                    hint_rsum: u32, 
-                    hint_crc32: u32, 
-                    mut rsum: u32, 
+fn loop_call_rec(mut data_uncompressed: &mut Vec<u8>,
+                    hint_dlen: u32,
+                    hint_bit_sum: u32,
+                    hint_rsum: u32,
+                    hint_crc32: u32,
+                    mut rsum: u32,
                     pluss: u32,
                     plusd: u32) -> bool {
     unsafe {
