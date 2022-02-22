@@ -1,0 +1,1 @@
+ToolkitHash  Hash Decrypter enables you to decrypt / reverse a hash in various formats into their original text. Hashes are often used to store password
