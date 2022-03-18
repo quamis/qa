@@ -5,12 +5,6 @@ extern crate test;
 use test::Bencher;
 use clap::Parser;
 use itertools::Itertools;
-use std::fs::File;
-use std::io::Read;
-use std::mem;
-use std::str;
-use md5;
-use data_encoding::HEXLOWER;
 
 // use rand::Rng;
 use rayon::prelude::*;
@@ -20,7 +14,7 @@ use rayon::prelude::*;
 #[clap(author, version, about, long_about = None)]
 struct Args {
     #[clap(short, long)]
-    characterTable: String,
+    character_table: String,
 }
 
 /**
@@ -34,20 +28,12 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    println!("characterTable {}!", args.characterTable);
+    println!("characterTable {}!", args.character_table);
 
-    let data = args.characterTable.as_bytes();
+    let data = args.character_table.as_bytes();
     let data_len = data.len();
 
     println!("fileWithCharacterTable {:#?}!", data);
-
-    let mut permutations_counter = 0;
-    for perm in data.iter().permutations(data_len) {
-        permutations_counter+=1;
-        // println!("try {:?}", perm.iter().map(|b| **b as char).join(""));
-    }
-
-    println!("permutations_counter: {:?}", permutations_counter);
 
 }
 
@@ -69,7 +55,7 @@ fn main() {
 
 fn itertools_permutations(data: &[u8], data_len: usize) -> u32 {
     let mut permutations_counter = 0;
-    for perm in data.iter().permutations(data_len) {
+    for _perm in data.iter().permutations(data_len) {
         permutations_counter+=1;
         // println!("try {:?}", perm.iter().map(|b| **b as char).join(""));
     }
@@ -107,7 +93,7 @@ fn utest_len_3_fike_permutations() {
     let data = "123".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
+    let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
@@ -119,7 +105,7 @@ fn utest_len_4_fike_permutations() {
     let data = "1234".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
+    let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
@@ -163,7 +149,7 @@ fn utest_len_3_itertools_permutations() {
     let data = "123".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = itertools_permutations(data, data_len);
+    let permutations_counter = itertools_permutations(data, data_len);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
@@ -176,7 +162,7 @@ fn utest_len_4_itertools_permutations() {
     let data = "1234".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = itertools_permutations(data, data_len);
+    let permutations_counter = itertools_permutations(data, data_len);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
@@ -189,7 +175,7 @@ fn utest_len_5_itertools_permutations() {
     let data = "12345".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = itertools_permutations(data, data_len);
+    let permutations_counter = itertools_permutations(data, data_len);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
@@ -201,7 +187,7 @@ fn utest_len_6_itertools_permutations() {
     let data = "123456".as_bytes();
     let data_len = data.len();
 
-    let mut permutations_counter = itertools_permutations(data, data_len);
+    let permutations_counter = itertools_permutations(data, data_len);
 
     println!("permutations_counter: {:?}", permutations_counter);
 
