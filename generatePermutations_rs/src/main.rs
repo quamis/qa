@@ -31,8 +31,6 @@ fn main() {
     println!("characterTable {}!", args.character_table);
 
     let data = args.character_table.as_bytes();
-    let data_len = data.len();
-
     println!("fileWithCharacterTable {:#?}!", data);
 
 }
@@ -72,7 +70,6 @@ fn itertools_permutations(data: &[u8], data_len: usize) -> u32 {
  */
 fn fike_permutations_rec(data:&mut Vec<u8>, data_len: usize, s:usize) -> u32 {
     let mut permutations_counter = 0;
-    let i: usize;
     if (s==data_len) {
         println!("try: {:?}", data.iter().map(|b| *b as char).join(""));
         return 1;
