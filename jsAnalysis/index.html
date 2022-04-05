@@ -14,48 +14,66 @@
 <body>
     <h1>JavaScript hasher</h1>
     <script src="js/md5.js"></script>
+    <script src="js/crc.min.js"></script>
+    <script src="js/sha1.min.js"></script>
+    <script src="js/sha256.min.js"></script>
+
+    <script src="js/jquery-3.6.0.min.js"></script>
     <script src="index.js"></script>
-    <form>
+    <form id="form" onSubmit="return onSubmit(event);">
         <p>
             <label for="input">Input</label>
-            <textarea rows="6" id="input"></textarea>
+            <textarea rows="6" id="input" onKeyUp="return onSubmit(event);"></textarea>
         </p>
         <p>
-            <button type="submit" id="calculate" onclick="
-            let hashes = computeHashes(input.value);
-            length.value = hashes.length;
-            sortedLetters.value = hashes.sortedLetters;
-            md5.value = hashes.md5;
-            binnedLettersCompressed.innerHTML = JSONSyntaxHighlight(hashes.binnedLettersCompressed);
-            stats.innerHTML = JSONSyntaxHighlight(hashes);
-            return false">Calculate</button>
-            <button type="reset" id="reset">Reset</button>
-        </p>
-        <p>
-        <table style="width: 100%;">
-            <tr>
-                <td>Length</td>
-                <td><input type="text" id="length" readonly /></td>
-                <td>Sorted letters</td>
-                <td><input type="text" id="sortedLetters" readonly /></td>
-            </tr>
-            <tr>
-                <td>MD5</td>
-                <td><input type="text" id="md5" readonly /></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>binnedLettersCompressed</td>
-                <td colspan="3"><pre id="binnedLettersCompressed" ></pre></td>
-            </tr>
-            <tr>
-                <td>Stats</td>
-                <td colspan="3" ><pre id="stats" style="width: 100%;"></pre></td>
-            </tr>
-        </table>
+            <button type="submit" id="calculate">Calculate</button>
         </p>
     </form>
+    <p>
+    <table style="width: 100%;">
+        <tr>
+            <td>Length</td>
+            <td><span id="length"></span></td>
+            <td>Sorted letters</td>
+            <td><span id="sortedLetters"></span></td>
+        </tr>
+        <tr>
+            <td>CRC16</td>
+            <td><span id="crc16"></span></td>
+            <td>CRC32</td>
+            <td><span id="crc32"></span></td>
+        </tr>
+        <tr>
+            <td>MD5</td>
+            <td><span id="md5"></span></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>SHA1</td>
+            <td><span id="sha1"></span></td>
+            <td>SHA256</td>
+            <td><span id="sha256"></span></td>
+        </tr>
+        <tr>
+            <td>binnedLettersCompressed</td>
+            <td colspan="3">
+                <pre id="binnedLettersCompressed"></pre>
+            </td>
+        </tr>
+        <tr>
+            <td>Stats</td>
+            <td colspan="3">
+                <pre id="stats" style="width: 100%;"></pre>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    (function($) {
+        onSubmit(null);
+    })(jQuery);
+    </script>
 </body>
 
 </html>

@@ -1,39 +1,64 @@
-computeHashes = function(text) {
-  let lettersArr = text.split('').sort();
-  let binnedLetters = {};
-  lettersArr.forEach(letter => {
-    if (!binnedLetters[letter]) {
-      binnedLetters[letter] = 1;
-    }
-    else {
-      binnedLetters[letter]++;
-    }
-  });
+onSubmit = function (event) {
+    let hashes = computeHashes(input.value);
 
-  let binnedLettersArr = Object.keys(binnedLetters).map(letter => {
+    $('#length').html(hashes.length);
+    $('#sortedLetters').html(hashes.sortedLetters);
+
+    $('#crc16').html(hashes.crc16);
+    $('#crc32').html(hashes.crc32);
+    $('#md5').html(hashes.md5);
+    $('#sha1').html(hashes.sha1);
+    $('#sha256').html(hashes.sha256);
+
+    $('#stats').html(JSONSyntaxHighlight(hashes));
+
+    $('#binnedLettersCompressed').html(JSONSyntaxHighlight(hashes.binnedLettersCompressed));
+
+    if (event) {
+        event.preventDefault();
+    }
+    return false;
+}
+computeHashes = function (text) {
+    let lettersArr = text.split('').sort();
+    let binnedLetters = {};
+    lettersArr.forEach(letter => {
+        if (!binnedLetters[letter]) {
+            binnedLetters[letter] = 1;
+        }
+        else {
+            binnedLetters[letter]++;
+        }
+    });
+
+    let binnedLettersArr = Object.keys(binnedLetters).map(letter => {
+        return {
+            letter: letter,
+            count: binnedLetters[letter]
+        };
+    }).sort((a, b) => {
+        return b.count - a.count;
+    });
+    let binnedLettersCompressedText = text.replaceAll(binnedLettersArr[0].letter, '');
+
     return {
-      letter: letter,
-      count: binnedLetters[letter]
+        text: text,
+        length: text.length,
+        sortedLetters: lettersArr.join(''),
+        binnedLettersArr: binnedLettersArr,
+        binnedLettersCompressed: {
+            missingLetter: binnedLettersArr[0].letter,
+            missingCount: text.length - binnedLettersCompressedText.length,
+            text: binnedLettersCompressedText,
+            length: binnedLettersCompressedText.length
+        },
+
+        crc16: crc16(text),
+        crc32: crc32(text),
+        md5: md5(text),
+        sha1: sha1(text),
+        sha256: sha256(text),
     };
-  }).sort((a, b) => {
-    return b.count - a.count;
-  });
-  let binnedLettersCompressedText = text.replaceAll(binnedLettersArr[0].letter, '');
-
-  return {
-    text:                       text,
-    length:                     text.length,
-    sortedLetters:              lettersArr.join(''),
-    binnedLettersArr:           binnedLettersArr,
-    binnedLettersCompressed:    {
-      missingLetter: binnedLettersArr[0].letter,
-      missingCount:  text.length - binnedLettersCompressedText.length,
-      text:   binnedLettersCompressedText,
-      length: binnedLettersCompressedText.length
-    },
-
-    md5:              md5(text),
-  };
 }
 
 
@@ -43,21 +68,23 @@ computeHashes = function(text) {
  * @returns {string}
  */
 function JSONSyntaxHighlight(jsonObj) {
-  let json = JSON.stringify(jsonObj, undefined, 2);
-  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-      var cls = 'number';
-      if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-              cls = 'key';
-          } else {
-              cls = 'string';
-          }
-      } else if (/true|false/.test(match)) {
-          cls = 'boolean';
-      } else if (/null/.test(match)) {
-          cls = 'null';
-      }
-      return '<span class="' + cls + '">' + match + '</span>';
-  });
+    let json = JSON.stringify(jsonObj, undefined, 2);
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        }
+        else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        }
+        else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
 }

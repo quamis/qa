@@ -10,7 +10,6 @@
  */
 
 body {
-  max-width: 990px;
   margin   : 0 auto;
   padding  : 1em;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
@@ -145,21 +144,21 @@ pre {
 }
 
 .string {
-  color: green;
+  color: #24b2ab;
 }
 
 .number {
-  color: darkorange;
+  color: #e13b8e;
 }
 
 .boolean {
-  color: blue;
+  color: #93a5ab;
 }
 
 .null {
-  color: magenta;
+  color: #5d99d9;
 }
 
 .key {
-  color: red;
+  color: #84aa00;
 }
