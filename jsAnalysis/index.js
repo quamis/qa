@@ -66,25 +66,6 @@ computeHashes = function (text) {
     });
     let binnedLettersCompressedText = text.replaceAll(binnedLettersArr[0].letter, '');
 
-    // return {
-    //     text: text,
-    //     length: text.length,
-    //     sortedLetters: lettersArr.join(''),
-    //     binnedLettersArr: binnedLettersArr,
-    //     binnedLettersCompressed: {
-    //         missingLetter: binnedLettersArr[0].letter,
-    //         missingCount: text.length - binnedLettersCompressedText.length,
-    //         text: binnedLettersCompressedText,
-    //         length: binnedLettersCompressedText.length
-    //     },
-
-    //     crc16: crc16(text),
-    //     crc32: crc32(text),
-    //     md5: md5(text),
-    //     sha1: sha1(text),
-    //     sha256: sha256(text),
-    // };
-
     ret.text= text;
     ret.length= text.length;
     ret.sortedLetters= lettersArr.join('');
