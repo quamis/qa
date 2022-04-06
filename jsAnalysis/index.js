@@ -2,7 +2,7 @@ onSubmit = function (event) {
     let hashes = computeHashes(input.value);
 
     $('#length').html(hashes.length);
-    $('#sortedLetters').html(hashes.sortedLetters);
+    $('#sortedLetters').html(hashes.sortedLetters.length<90?hashes.sortedLetters:(hashes.sortedLetters.substr(0, 88)+"..."));
 
     $('#crc16').html(hashes.crc16);
     $('#crc32').html(hashes.crc32);
@@ -19,7 +19,32 @@ onSubmit = function (event) {
     }
     return false;
 }
+
+
 computeHashes = function (text) {
+    let ret = {
+        text:           '',
+        length:         0,
+        sortedLetters:  '',
+        binnedLettersArr: [],
+        binnedLettersCompressed: {
+            missingLetter: '',
+            missingCount: 0,
+            text: '',
+            length: 0
+        },
+
+        crc16:  '',
+        crc32:  '',
+        md5:    '',
+        sha1:   '',
+        sha256: '',
+    };
+
+    if (!text) {
+        return ret;
+    }
+
     let lettersArr = text.split('').sort();
     let binnedLetters = {};
     lettersArr.forEach(letter => {
@@ -41,24 +66,43 @@ computeHashes = function (text) {
     });
     let binnedLettersCompressedText = text.replaceAll(binnedLettersArr[0].letter, '');
 
-    return {
-        text: text,
-        length: text.length,
-        sortedLetters: lettersArr.join(''),
-        binnedLettersArr: binnedLettersArr,
-        binnedLettersCompressed: {
-            missingLetter: binnedLettersArr[0].letter,
-            missingCount: text.length - binnedLettersCompressedText.length,
-            text: binnedLettersCompressedText,
-            length: binnedLettersCompressedText.length
-        },
+    // return {
+    //     text: text,
+    //     length: text.length,
+    //     sortedLetters: lettersArr.join(''),
+    //     binnedLettersArr: binnedLettersArr,
+    //     binnedLettersCompressed: {
+    //         missingLetter: binnedLettersArr[0].letter,
+    //         missingCount: text.length - binnedLettersCompressedText.length,
+    //         text: binnedLettersCompressedText,
+    //         length: binnedLettersCompressedText.length
+    //     },
 
-        crc16: crc16(text),
-        crc32: crc32(text),
-        md5: md5(text),
-        sha1: sha1(text),
-        sha256: sha256(text),
+    //     crc16: crc16(text),
+    //     crc32: crc32(text),
+    //     md5: md5(text),
+    //     sha1: sha1(text),
+    //     sha256: sha256(text),
+    // };
+
+    ret.text= text;
+    ret.length= text.length;
+    ret.sortedLetters= lettersArr.join('');
+    ret.binnedLettersArr= binnedLettersArr;
+    ret.binnedLettersCompressed= {
+        missingLetter: binnedLettersArr[0].letter,
+        missingCount: text.length - binnedLettersCompressedText.length,
+        text: binnedLettersCompressedText,
+        length: binnedLettersCompressedText.length
     };
+
+    ret.crc16= crc16(text);
+    ret.crc32= crc32(text);
+    ret.md5= md5(text);
+    ret.sha1= sha1(text);
+    ret.sha256= sha256(text);
+
+    return ret;
 }
 
 

@@ -136,11 +136,17 @@ button:active {
   }
 }
 
+td.hash {
+  font-family: 'Courier New', Courier, monospace;
+}
+
 
 pre {
   outline: 1px solid #ccc;
   padding: 5px;
   margin : 5px;
+  overflow: scroll;
+  width: 70vw;
 }
 
 .string {

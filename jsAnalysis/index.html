@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <h1>JavaScript hasher</h1>
+    <h1 style="text-align: center; padding: 0; margin: 0;">JavaScript hasher</h1>
     <script src="js/md5.js"></script>
     <script src="js/crc.min.js"></script>
     <script src="js/sha1.min.js"></script>
@@ -22,7 +22,6 @@
     <script src="index.js"></script>
     <form id="form" onSubmit="return onSubmit(event);">
         <p>
-            <label for="input">Input</label>
             <textarea rows="6" id="input" onKeyUp="return onSubmit(event);"></textarea>
         </p>
         <p>
@@ -32,39 +31,39 @@
     <p>
     <table style="width: 100%;">
         <tr>
-            <td>Length</td>
-            <td><span id="length"></span></td>
-            <td>Sorted letters</td>
-            <td><span id="sortedLetters"></span></td>
+            <td class="label">Length</td>
+            <td class="hash"><span id="length"></span></td>
+            <td class="label">Sorted letters</td>
+            <td class="hash"><span id="sortedLetters"></span></td>
         </tr>
         <tr>
-            <td>CRC16</td>
-            <td><span id="crc16"></span></td>
-            <td>CRC32</td>
-            <td><span id="crc32"></span></td>
+            <td class="label">CRC16</td>
+            <td class="hash"><span id="crc16"></span></td>
+            <td class="label">CRC32</td>
+            <td class="hash"><span id="crc32"></span></td>
         </tr>
         <tr>
-            <td>MD5</td>
-            <td><span id="md5"></span></td>
-            <td></td>
-            <td></td>
+            <td class="label">MD5</td>
+            <td class="hash"><span id="md5"></span></td>
+            <td class="label"></td>
+            <td class="hash"></td>
         </tr>
         <tr>
-            <td>SHA1</td>
-            <td><span id="sha1"></span></td>
-            <td>SHA256</td>
-            <td><span id="sha256"></span></td>
+            <td class="label">SHA1</td>
+            <td class="hash"><span id="sha1"></span></td>
+            <td class="label">SHA256</td>
+            <td class="hash"><span id="sha256"></span></td>
         </tr>
         <tr>
-            <td>binnedLettersCompressed</td>
-            <td colspan="3">
+            <td class="label">binnedLettersCompressed</td>
+            <td class="hash" colspan="3">
                 <pre id="binnedLettersCompressed"></pre>
             </td>
         </tr>
         <tr>
-            <td>Stats</td>
-            <td colspan="3">
-                <pre id="stats" style="width: 100%;"></pre>
+            <td class="label">Stats</td>
+            <td class="hash" colspan="3">
+                <pre id="stats"></pre>
             </td>
         </tr>
     </table>
