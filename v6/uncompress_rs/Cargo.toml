@@ -1,0 +1,18 @@
+[package]
+name = "uncompress_rs"
+version = "0.1.0"
+edition = "2018"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "/usr/bin/clang"
+rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clink-arg=-Wl,--no-rosegment"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "3.0.14", features = ["derive"] }
+itertools = "0.10.2"
+data-encoding = "2.3.2"
+md5 = "0.7.0"
+rayon = "1.5.1"
+rand = "0.8.5"
