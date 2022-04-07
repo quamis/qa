@@ -2,7 +2,12 @@ onSubmit = function (event) {
     let hashes = computeHashes(input.value);
 
     $('#length').html(hashes.length);
-    $('#sortedLetters').html(hashes.sortedLetters.length<90?hashes.sortedLetters:(hashes.sortedLetters.substr(0, 88)+"..."));
+
+    let friendlySortedLetters = hashes.sortedLetters.replaceAll(/[\s\r\n]/g, '');
+    let maxLen = 60;
+    $('#sortedLetters').html(
+        friendlySortedLetters.length<maxLen?friendlySortedLetters:(friendlySortedLetters.substr(0, maxLen-3)+"...")
+    );
 
     $('#crc16').html(hashes.crc16);
     $('#crc32').html(hashes.crc32);
@@ -13,6 +18,8 @@ onSubmit = function (event) {
     $('#stats').html(JSONSyntaxHighlight(hashes));
 
     $('#binnedLettersCompressed').html(JSONSyntaxHighlight(hashes.binnedLettersCompressed));
+
+    $('#input').attr('data-hashes', JSON.stringify(hashes));
 
     if (event) {
         event.preventDefault();

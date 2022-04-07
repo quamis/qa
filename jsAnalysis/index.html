@@ -71,6 +71,18 @@
     <script>
     (function($) {
         onSubmit(null);
+
+        $('#sortedLetters').on('click', function() {
+            let hashes = JSON.parse($('#input').attr('data-hashes'));
+            $('#input').val(hashes.sortedLetters);
+            onSubmit(null);
+        });
+
+        $('#binnedLettersCompressed').on('click', function() {
+            let hashes = JSON.parse($('#input').attr('data-hashes'));
+            $('#input').val(hashes.binnedLettersCompressed.text);
+            onSubmit(null);
+        });
     })(jQuery);
     </script>
 </body>
