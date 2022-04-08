@@ -33,8 +33,7 @@ fn main() {
  *  reset && cargo bench utest_len_3_fike_permutations -- --nocapture
  *
  */
-fn fike_permutations_rec(data:&mut Vec<u8>, data_len: usize, s:usize) -> u32 {
-    let mut permutations_counter = 0;
+fn reorganise_v1(original_data:&mut Vec<u8>, missing_data_buffer: usize, missing_data_char:u8) -> u8 {
     if (s==data_len) {
         println!("try: {:?}", data.iter().map(|b| *b as char).join(""));
         return 1;
@@ -50,40 +49,40 @@ fn fike_permutations_rec(data:&mut Vec<u8>, data_len: usize, s:usize) -> u32 {
 }
 
 
-#[test]
-fn utest_len_3_fike_permutations() {
-    let data = "123".as_bytes();
-    let data_len = data.len();
+// #[test]
+// fn utest_len_3_fike_permutations() {
+//     let data = "123".as_bytes();
+//     let data_len = data.len();
 
-    let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
+//     let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
 
-    println!("permutations_counter: {:?}", permutations_counter);
+//     println!("permutations_counter: {:?}", permutations_counter);
 
-    assert_eq!(permutations_counter, 6);
-}
+//     assert_eq!(permutations_counter, 6);
+// }
 
-#[test]
-fn utest_len_4_fike_permutations() {
-    let data = "1234".as_bytes();
-    let data_len = data.len();
+// #[test]
+// fn utest_len_4_fike_permutations() {
+//     let data = "1234".as_bytes();
+//     let data_len = data.len();
 
-    let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
+//     let permutations_counter = fike_permutations_rec(&mut data.to_vec(), data_len, 0);
 
-    println!("permutations_counter: {:?}", permutations_counter);
+//     println!("permutations_counter: {:?}", permutations_counter);
 
-    assert_eq!(permutations_counter, 24);
-}
+//     assert_eq!(permutations_counter, 24);
+// }
 
-/**
- * reset && cargo bench ubench_len_4_fike_permutations
- */
+// /**
+//  * reset && cargo bench ubench_len_4_fike_permutations
+//  */
 
-#[bench]
-fn ubench_len_4_fike_permutations(b: &mut Bencher) {
-    let data = "1234".as_bytes();
-    let data_len = data.len();
+// #[bench]
+// fn ubench_len_4_fike_permutations(b: &mut Bencher) {
+//     let data = "1234".as_bytes();
+//     let data_len = data.len();
 
-    println!("fileWithCharacterTable {:#?}!", data);
+//     println!("fileWithCharacterTable {:#?}!", data);
 
-    b.iter(|| fike_permutations_rec(&mut data.to_vec(), data_len, 0));
-}
+//     b.iter(|| fike_permutations_rec(&mut data.to_vec(), data_len, 0));
+// }
